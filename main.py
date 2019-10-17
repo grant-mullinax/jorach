@@ -36,22 +36,23 @@ async def on_ready():
     print("------")
 
 
-@bot.command()
+@bot.command(description="Lists all available roles")
 async def roles(ctx):
     await ctx.send("Valid roles are: " + str(available_roles))
     return
 
 
-@bot.command()
+@bot.command(description="Lists all available raids")
 async def raids(ctx):
-    worksheets = spreadsheet.worksheets()
-    raid_names = map(lambda ws: ws.title, worksheets)
+    worksheets = spreadsheet.worksheets()  # probably can consolidate this with the register command
+    raid_names = list(map(lambda ws: ws.title, worksheets))
+    raid_names.remove("identity")
 
-    await ctx.send("Available raids are: " + str(list(raid_names)))
+    await ctx.send("Available raids are: " + str(raid_names))
     return
 
 
-@bot.command()
+@bot.command(description="Provides a link to the registry spreadsheet")
 async def sheet(ctx):
     await ctx.send(
         "See the spreadsheet at:\n https://docs.google.com/spreadsheets/d/" + config["default"]["SpreadsheetId"]
@@ -59,7 +60,7 @@ async def sheet(ctx):
     return
 
 
-@bot.command()
+@bot.command(description="Registers your identity with the bot on the spreadsheet")
 async def identity(ctx, name: str, wow_class: str, role: str):
     if wow_class.lower() not in wow_classes:
         await ctx.send("Invalid class name.")
@@ -79,7 +80,7 @@ async def identity(ctx, name: str, wow_class: str, role: str):
     await ctx.send("Your identity has been recorded.")
 
 
-@bot.command()
+@bot.command(description="Sets whether or not you are ony attuned")
 async def onyattunement(ctx, attuned: bool):
     discord_ids = identity_worksheet.col_values(1)
     author_hash = str(hash(ctx.author))
@@ -92,7 +93,7 @@ async def onyattunement(ctx, attuned: bool):
     await ctx.send("Your attunement has been recorded.")
 
 
-@bot.command()
+@bot.command(description="Signs you up for a given raid")
 async def register(ctx, raid_name: str):
     raid_name_lower = raid_name.lower()
 
