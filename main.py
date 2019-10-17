@@ -44,8 +44,10 @@ async def roles(ctx):
 
 @bot.command()
 async def sheet(ctx):
-    await ctx.send("See the spreadsheet at:\n https://docs.google.com/spreadsheets/d/" + config["default"]["SpreadsheetId"])
+    await ctx.send(
+        "See the spreadsheet at:\n https://docs.google.com/spreadsheets/d/" + config["default"]["SpreadsheetId"])
     return
+
 
 @bot.command()
 async def identity(ctx, name: str, wow_class: str, role: str):
@@ -68,7 +70,7 @@ async def identity(ctx, name: str, wow_class: str, role: str):
 
 
 @bot.command()
-async def attunement(ctx, attuned: bool):
+async def onyattunement(ctx, attuned: bool):
     discord_ids = identity_worksheet.col_values(1)
     author_hash = str(hash(ctx.author))
 
@@ -111,7 +113,9 @@ async def register(ctx, raid_name: str):
         await ctx.send("You have already signed up for this raid!")
         return
 
-    raid_worksheet.insert_row([name, wow_class, role, str(datetime.now())])
+    # hacky workaround for append row not working here
+    raid_worksheet.insert_row([name, wow_class, role, str(datetime.now())], len(names) + 1)
     await ctx.send("Your availability has been noted for the upcoming raid.")
+
 
 bot.run(config["keys"]["DiscordSecret"])
