@@ -1,4 +1,3 @@
-import discord
 import secret
 from discord.ext import commands
 import gspread
@@ -10,7 +9,7 @@ scope = ["https://spreadsheets.google.com/feeds",
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name("Jorach-5b2d048d0abd.json", scope)
 gc = gspread.authorize(credentials)
-spreadsheet = gc.open_by_key("1xOtoOyKbesB-EOqKLvfv6cB_oj30pr_LYlFZ_BkuqwU")
+spreadsheet = gc.open_by_key("1xOtoOyKbesB-EOqKLvfv6cB_oj30pr_LYlFZ_BkuqwU")  # spreadsheet id
 identity_worksheet = spreadsheet.worksheet("identity")
 
 bot = commands.Bot(command_prefix="!", description="its jorach")
@@ -64,9 +63,16 @@ async def register(ctx, raid_name: str):
         return
 
     raid_worksheet = spreadsheet.worksheet(raid_name)
+    identity_values = identity_worksheet.row_values(discord_ids.index(author_hash) + 1)
 
-    values = identity_worksheet.row_values(discord_ids.index(author_hash) + 1)
-    raid_worksheet.insert_row([values[2], values[3], values[4], str(datetime.now())])  # name, class, and role
+    name, wow_class, role = (identity_values[2], identity_values[3], identity_values[4])
+    names = raid_worksheet.col_values(1)
+
+    if name in names:
+        await ctx.send("you have already signed up for this raid!")
+        return
+
+    raid_worksheet.insert_row([name, wow_class, role, str(datetime.now())])
     await ctx.send("you have been signed up")
 
 bot.run(secret.discord_token)
