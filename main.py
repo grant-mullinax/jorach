@@ -15,10 +15,17 @@ gc = gspread.authorize(credentials)
 spreadsheet = gc.open_by_key(config["default"]["SpreadsheetId"])
 identity_worksheet = spreadsheet.worksheet("identity")
 
-bot = commands.Bot(command_prefix="!", description="My name is Jorach ")
+bot = commands.Bot(command_prefix="!", description=
+"""My name is Jorach Ravenholdt and I'm here to help YOU raid.
+Get started by using the !identity command.
+!identity <name> <wow_class> <role>
+
+look at my insides at
+https://github.com/grant-mullinax/jorach
+""")
 
 wow_classes = ["druid", "hunter", "mage", "paladin", "priest", "rogue", "warlock", "warrior"]
-roles = ["dps", "tank", "healer"]
+available_roles = ["dps", "tank", "healer"]
 
 
 @bot.event
@@ -31,9 +38,14 @@ async def on_ready():
 
 @bot.command()
 async def roles(ctx):
-    await ctx.send("Valid roles are: " + str(roles))
+    await ctx.send("Valid roles are: " + str(available_roles))
     return
 
+
+@bot.command()
+async def sheet(ctx):
+    await ctx.send("See the spreadsheet at:\n https://docs.google.com/spreadsheets/d/" + config["default"]["SpreadsheetId"])
+    return
 
 @bot.command()
 async def identity(ctx, name: str, wow_class: str, role: str):
@@ -41,7 +53,7 @@ async def identity(ctx, name: str, wow_class: str, role: str):
         await ctx.send("Invalid class name.")
         return
 
-    if role.lower() not in roles:
+    if role.lower() not in available_roles:
         await ctx.send("Invalid role, valid roles are " + str(roles))
         return
 
