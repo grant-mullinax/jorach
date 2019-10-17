@@ -43,9 +43,19 @@ async def roles(ctx):
 
 
 @bot.command()
+async def raids(ctx):
+    worksheets = spreadsheet.worksheets()
+    raid_names = map(lambda ws: ws.title, worksheets)
+
+    await ctx.send("Available raids are: " + str(list(raid_names)))
+    return
+
+
+@bot.command()
 async def sheet(ctx):
     await ctx.send(
-        "See the spreadsheet at:\n https://docs.google.com/spreadsheets/d/" + config["default"]["SpreadsheetId"])
+        "See the spreadsheet at:\n https://docs.google.com/spreadsheets/d/" + config["default"]["SpreadsheetId"]
+    )
     return
 
 
@@ -100,7 +110,7 @@ async def register(ctx, raid_name: str):
     worksheets = spreadsheet.worksheets()
     raid_names = map(lambda ws: ws.title, worksheets)
     if raid_name_lower not in raid_names:
-        await ctx.send("That is not a valid raid! valid raids are: " + str(raid_names))
+        await ctx.send("That is not a valid raid! valid raids are: " + str(list(raid_names)))
         return
 
     raid_worksheet = spreadsheet.worksheet(raid_name_lower)
