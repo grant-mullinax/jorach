@@ -45,7 +45,7 @@ async def identity(ctx, name: str, wow_class: str, role: str):
     if author_hash in discord_ids:
         identity_worksheet.delete_row(discord_ids.index(author_hash) + 1)  # sheets is indexed starting at 1
 
-    identity_worksheet.append_row([author_hash, str(ctx.author), name, wow_class, role])
+    identity_worksheet.append_row([author_hash, str(ctx.author), name.lower(), wow_class.lower(), role.lower()])
     await ctx.send("your identity has been saved")
 
 
