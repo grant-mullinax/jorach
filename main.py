@@ -46,6 +46,7 @@ async def roles(ctx):
 
 @bot.command(description="Lists all available raids")
 async def raids(ctx):
+    schedule.run_pending()
     worksheets = spreadsheet.worksheets()  # probably can consolidate this with the register command
     raid_names = list(map(lambda ws: ws.title, worksheets))
     raid_names.remove("identity")
@@ -64,6 +65,7 @@ async def sheet(ctx):
 
 @bot.command(description="Registers your identity with the bot on the spreadsheet")
 async def identity(ctx, name: str, wow_class: str, role: str):
+    schedule.run_pending()
     if wow_class.lower() not in wow_classes:
         await ctx.send("Invalid class name.")
         return
@@ -84,6 +86,7 @@ async def identity(ctx, name: str, wow_class: str, role: str):
 
 @bot.command(description="Sets whether or not you are ony attuned")
 async def onyattunement(ctx, attuned: bool):
+    schedule.run_pending()
     discord_ids = identity_worksheet.col_values(1)
     author_hash = str(hash(ctx.author))
 
@@ -97,6 +100,7 @@ async def onyattunement(ctx, attuned: bool):
 
 @bot.command(description="Signs you up for a given raid")
 async def register(ctx, raid_name: str):
+    schedule.run_pending()
     raid_name_lower = raid_name.lower()
 
     if raid_name_lower == "identity":
@@ -131,8 +135,7 @@ async def register(ctx, raid_name: str):
     await ctx.send("Your availability has been noted for the upcoming raid.")
 
 
-bot.run(config["keys"]["DiscordSecret"])
+# terrible band-aid
+schedule.every(20).minutes.do(lambda _: gc.login())
 
-while True:
-    time.sleep(1500)
-    gc.login()
+bot.run(config["keys"]["DiscordSecret"])
