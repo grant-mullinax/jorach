@@ -3,3 +3,4 @@ secret.py
 .idea
 jorach/
 config.ini
+*/__pycache__/

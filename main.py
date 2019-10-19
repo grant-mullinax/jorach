@@ -1,33 +1,41 @@
-from discord.ext import commands
-import gspread
 import configparser
-import schedule
-import time
-from datetime import datetime
-from oauth2client.service_account import ServiceAccountCredentials
+
+from Commands.IdentityCommand import IdentityCommand
+from Commands.OnyAttunementCommand import OnyAttunementCommand
+from Commands.RaidsCommand import RaidsCommand
+from Commands.RegisterCommand import RegisterCommand
+from Commands.RolesCommand import RolesCommand
+from Commands.SheetCommand import SheetCommand
+
+from DataProviders.GoogleCredentialProvider import get_google_credentials
+from DataProviders.JorachBotProvider import get_jorach
+
+# Global Variables
+
+wow_classes = ["druid", "hunter", "mage", "paladin", "priest", "rogue", "warlock", "warrior"]
+available_roles = ["dps", "tank", "healer"]
+
+# Load configuration info
 
 config = configparser.ConfigParser()
 config.read_file(open('config.ini'))
 
-scope = ["https://spreadsheets.google.com/feeds",
-         "https://www.googleapis.com/auth/drive"]
+# Get spreadsheets and worksheets
 
-credentials = ServiceAccountCredentials.from_json_keyfile_name(config["keys"]["GoogleCredentialsFile"], scope)
-gc = gspread.authorize(credentials)
+gc = get_google_credentials()
 spreadsheet = gc.open_by_key(config["default"]["SpreadsheetId"])
 identity_worksheet = spreadsheet.worksheet("identity")
 
-bot = commands.Bot(command_prefix="!", description=
-"""My name is Jorach Ravenholdt and I'm here to help YOU raid.
-Get started by using the !identity command.
-!identity <name> <wow_class> <role>
+# Get bot and register commands
 
-look at my insides at
-https://github.com/grant-mullinax/jorach
-""")
-
-wow_classes = ["druid", "hunter", "mage", "paladin", "priest", "rogue", "warlock", "warrior"]
-available_roles = ["dps", "tank", "healer"]
+bot = get_jorach()
+bot.add_cog(IdentityCommand(identity_worksheet=identity_worksheet, list_available_classes=wow_classes,
+                            list_available_roles=available_roles))
+bot.add_cog(OnyAttunementCommand(identity_worksheet=identity_worksheet))
+bot.add_cog(RaidsCommand(spreadsheet=spreadsheet, excluded_sheet_names=[identity_worksheet.title]))
+bot.add_cog(RegisterCommand(spreadsheet=spreadsheet, identity_worksheet=identity_worksheet))
+bot.add_cog(RolesCommand(list_available_roles=available_roles))
+bot.add_cog(SheetCommand(spreadsheet_id=spreadsheet.id))
 
 
 @bot.event
@@ -37,102 +45,4 @@ async def on_ready():
     print(bot.user.id)
     print("------")
 
-
-@bot.command(description="Lists all available roles")
-async def roles(ctx):
-    await ctx.send("Valid roles are: " + str(available_roles))
-    return
-
-
-@bot.command(description="Lists all available raids")
-async def raids(ctx):
-    worksheets = spreadsheet.worksheets()  # probably can consolidate this with the register command
-    raid_names = list(map(lambda ws: ws.title, worksheets))
-    raid_names.remove("identity")
-
-    await ctx.send("Available raids are: " + str(raid_names))
-    return
-
-
-@bot.command(description="Provides a link to the registry spreadsheet")
-async def sheet(ctx):
-    await ctx.send(
-        "See the spreadsheet at:\n https://docs.google.com/spreadsheets/d/" + config["default"]["SpreadsheetId"]
-    )
-    return
-
-
-@bot.command(description="Registers your identity with the bot on the spreadsheet")
-async def identity(ctx, name: str, wow_class: str, role: str):
-    if wow_class.lower() not in wow_classes:
-        await ctx.send("Invalid class name.")
-        return
-
-    if role.lower() not in available_roles:
-        await ctx.send("Invalid role, valid roles are " + str(roles))
-        return
-
-    discord_ids = identity_worksheet.col_values(1)
-    author_hash = str(hash(ctx.author))
-
-    if author_hash in discord_ids:
-        identity_worksheet.delete_row(discord_ids.index(author_hash) + 1)  # sheets is indexed starting at 1
-
-    identity_worksheet.append_row([author_hash, str(ctx.author), name.lower(), wow_class.lower(), role.lower()])
-    await ctx.send("Your identity has been recorded.")
-
-
-@bot.command(description="Sets whether or not you are ony attuned")
-async def onyattunement(ctx, attuned: bool):
-    discord_ids = identity_worksheet.col_values(1)
-    author_hash = str(hash(ctx.author))
-
-    if author_hash not in discord_ids:
-        await ctx.send("Your identity has not been recorded! Please use the !identity command")
-        return
-
-    identity_worksheet.update_cell(discord_ids.index(author_hash) + 1, 6, str(attuned))
-    await ctx.send("Your attunement has been recorded.")
-
-
-@bot.command(description="Signs you up for a given raid")
-async def register(ctx, raid_name: str):
-    raid_name_lower = raid_name.lower()
-
-    if raid_name_lower == "identity":
-        await ctx.send("nice try")
-        return
-
-    discord_ids = identity_worksheet.col_values(1)
-    author_hash = str(hash(ctx.author))
-
-    if author_hash not in discord_ids:
-        await ctx.send("Your identity has not been recorded! Please use the !identity command")
-        return
-
-    worksheets = spreadsheet.worksheets()
-    raid_names = map(lambda ws: ws.title, worksheets)
-    if raid_name_lower not in raid_names:
-        await ctx.send("That is not a valid raid! valid raids are: " + str(list(raid_names)))
-        return
-
-    raid_worksheet = spreadsheet.worksheet(raid_name_lower)
-    identity_values = identity_worksheet.row_values(discord_ids.index(author_hash) + 1)
-
-    name, wow_class, role = (identity_values[2], identity_values[3], identity_values[4])
-    names = raid_worksheet.col_values(1)
-
-    if name in names:
-        await ctx.send("You have already signed up for this raid!")
-        return
-
-    # hacky workaround for append row not working here
-    raid_worksheet.insert_row([name, wow_class, role, str(datetime.now())], len(names) + 1)
-    await ctx.send("Your availability has been noted for the upcoming raid.")
-
-
 bot.run(config["keys"]["DiscordSecret"])
-
-while True:
-    time.sleep(1500)
-    gc.login()
