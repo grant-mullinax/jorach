@@ -2,6 +2,7 @@ from discord.ext import commands
 import gspread
 import configparser
 import schedule
+import time
 from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -130,6 +131,8 @@ async def register(ctx, raid_name: str):
     await ctx.send("Your availability has been noted for the upcoming raid.")
 
 
-# terrible band-aid
-schedule.every(20).minutes.do(lambda _: gc.login())
 bot.run(config["keys"]["DiscordSecret"])
+
+while True:
+    time.sleep(1500)
+    gc.login()
