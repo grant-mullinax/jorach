@@ -8,7 +8,7 @@ Get started by using the !identity command.
 look at my insides at
 https://github.com/grant-mullinax/jorach
 """
-__bot = commands.Bot(command_prefix="!", description=__bot_description)
+__bot = commands.Bot(command_prefix="!", description=__bot_description, case_insensitive=True)
 
 
 def get_jorach():
@@ -16,3 +16,5 @@ def get_jorach():
     :return: The discord bot that is currently activate
     """
     return __bot
+
+def get_chat_client():
