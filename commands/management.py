@@ -7,17 +7,21 @@ from schema.emoji import get_emoji_map
 from sheets.client import *
 
 
-class CreateRaidCommand(commands.Cog):
+class Management(commands.Cog):
     """
-    `CreateRaidCommand` is a class that allows a user to start a new raid
+    `Management` is a class that allows admin users to create raids for users
     """
 
     @commands.command(name="startraid", description="Starts a new raid with a given name on a given date")
-    async def run_command(self, ctx, raid_name: str, raid_month: int, raid_date: int, raid_time: str):
+    async def startraid(self, ctx, raid_name: str, raid_month: int, raid_date: int, raid_time: str):
         """
         Registers the user in the spreadsheet provided all info is correct. Otherwise, informs the user that this
         command failed due to their syntax.
 
+        :param raid_name:
+        :param raid_month:
+        :param raid_date:
+        :param raid_time:
         :param ctx: The context of invocation for the command that sheet was ran on.
         """
         # remove colons because it screws up some sheets calls, heh

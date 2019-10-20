@@ -10,5 +10,6 @@ class WowClass(Enum):
     warlock = "warlock"
     warrior = "warrior"
 
+
 def get_all_classes():
     return [c.value for c in WowClass]

@@ -25,6 +25,7 @@ _spec_to_role = {
     Spec.holy: Role.healer,
 }
 
+
 def get_role_from_spec(spec: Spec) -> Role:
     role = _spec_to_role.get(spec, None)
     if role == None:
