@@ -1,5 +1,7 @@
 from discord.ext import commands
 
+from schema.classes import *
+from schema.roles import *
 from Commands.SafeOAuthBasedCommand import SafeOAuthBasedCommand
 
 
@@ -9,17 +11,13 @@ class IdentityCommand(SafeOAuthBasedCommand):
     themselves so that they can register for raids.
     """
 
-    def __init__(self, identity_worksheet, list_available_classes, list_available_roles):
+    def __init__(self, identity_worksheet):
         """
         Initializes an `IdentityCommand` with the provided classes and roles that are available.
 
         :param identity_worksheet: The worksheet where user identities should be stored to
-        :param list_available_classes: The list of available classes that a user can choose from
-        :param list_available_roles: The list of available roles that a user can choose from
         """
         self.__identity_worksheet = identity_worksheet
-        self.__list_available_roles = list_available_roles
-        self.__list_available_classes = list_available_classes
         return
 
     @commands.command(name="identity", description="Registers your identity with the bot on the spreadsheet")
@@ -35,16 +33,16 @@ class IdentityCommand(SafeOAuthBasedCommand):
         :param ctx: The context of invocation for the command that sheet was ran on.
         :param params: An array of 3 objects in this order: name, class, and role
         """
-        name = params[0]
-        wow_class = params[1]
-        role = params[2]
+        name, wow_class, role = params[:3]
+        classes = get_all_classes()
+        roles = get_all_roles()
 
-        if wow_class.lower() not in self.__list_available_classes:
+        if wow_class.lower() not in classes:
             await ctx.send("Invalid class name.")
             return
 
-        if role.lower() not in self.__list_available_roles:
-            await ctx.send("Invalid role, valid roles are %s" + ", ".join(self.__list_available_roles))
+        if role.lower() not in roles:
+            await ctx.send("Invalid role, valid roles are %s" + ", ".join(roles))
             return
 
         discord_ids = self.__identity_worksheet.col_values(1)

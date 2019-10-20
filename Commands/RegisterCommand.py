@@ -58,7 +58,7 @@ class RegisterCommand(SafeOAuthBasedCommand):
         raid_worksheet = self.__spreadsheet.worksheet(raid_name_lower)
         identity_values = self.__identity_worksheet.row_values(discord_ids.index(author_hash) + 1)
 
-        name, wow_class, role = (identity_values[2], identity_values[3], identity_values[4])
+        name, wow_class, role = identity_values[2:5]
         names = raid_worksheet.col_values(1)
 
         if name in names:

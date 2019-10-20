@@ -8,9 +8,9 @@ from oauth2client.service_account import ServiceAccountCredentials
 __scope = ["https://spreadsheets.google.com/feeds",
            "https://www.googleapis.com/auth/drive"]
 
-config = configparser.ConfigParser()
-config.read_file(open('config.ini'))
-__credentials = ServiceAccountCredentials.from_json_keyfile_name(config["keys"]["GoogleCredentialsFile"], __scope)
+__config = configparser.ConfigParser()
+__config.read_file(open('config.ini'))
+__credentials = ServiceAccountCredentials.from_json_keyfile_name(__config["keys"]["GoogleCredentialsFile"], __scope)
 __gc = gspread.authorize(__credentials)
 
 

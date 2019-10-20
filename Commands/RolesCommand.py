@@ -1,5 +1,6 @@
 from discord.ext import commands
 
+from schema.roles import *
 from Commands.SafeOAuthBasedCommand import SafeOAuthBasedCommand
 
 
@@ -10,15 +11,6 @@ class RolesCommand(SafeOAuthBasedCommand):
 
     This command will likely be removed in the future as we move to emote-based signups.
     """
-
-    def __init__(self, list_available_roles):
-        """
-        Initializes a `RolesCommand` with the provided roles.
-
-        :param list_available_roles: The roles that are available for users to select
-        """
-        self.__list_available_roles = list_available_roles
-        return
 
     @commands.command(name="roles", description="Lists all available roles")
     async def execute_sheet_command(self, ctx):
@@ -32,5 +24,5 @@ class RolesCommand(SafeOAuthBasedCommand):
         :param ctx: The context of invocation for the command that sheet was ran on.
         :param params: No parameters are used.
         """
-        await ctx.send("Valid roles are: %s" % ", ".join(self.__list_available_roles))
+        await ctx.send("Valid roles are: %s" % ", ".join(get_all_roles()))
         return
