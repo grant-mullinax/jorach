@@ -1,23 +1,18 @@
 from discord.ext import commands
 
-from schema.roles import *
-from Commands.SafeOAuthBasedCommand import SafeOAuthBasedCommand
+from schema.roles import get_all_roles
 
 
-class RolesCommand(SafeOAuthBasedCommand):
+class RolesCommand(commands.Cog):
     """
-    `RolesCommand` is a class conforming to `SafeOAuthBasedCommand` that allows users to request to available roles
+    `RolesCommand` is a class that allows users to request to available roles
     to sign up for in `IdentityCommand`.
 
     This command will likely be removed in the future as we move to emote-based signups.
     """
 
     @commands.command(name="roles", description="Lists all available roles")
-    async def execute_sheet_command(self, ctx):
-        await self.execute(ctx=ctx, params=None)
-        return
-
-    async def run_command(self, ctx, params):
+    async def run_command(self, ctx, params=None):
         """
         Informs the user on what roles are available for selection.
 
