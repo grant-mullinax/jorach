@@ -16,5 +16,3 @@ def get_jorach():
     :return: The discord bot that is currently activate
     """
     return __bot
-
-def get_chat_client():
