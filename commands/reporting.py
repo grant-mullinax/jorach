@@ -30,11 +30,11 @@ class Reporting(commands.Cog):
         roles = get_all_roles()
 
         if wow_class.lower() not in classes:
-            await ctx.send("Invalid class name.")
+            await ctx.author.send("Invalid class name, valid classes are {}".format(",".join(classes)))
             return
 
         if role.lower() not in roles:
-            await ctx.send("Invalid role, valid roles are %s" + ", ".join(roles))
+            await ctx.author.send("Invalid role, valid roles are {}".format(", ".join(roles)))
             return
 
         identity_worksheet = get_identity_worksheet()
@@ -47,7 +47,7 @@ class Reporting(commands.Cog):
 
         append_row(identity_worksheet,
             [author_hash, str(ctx.author), name.lower(), wow_class.lower(), role.lower()])
-        await ctx.send("Your identity has been recorded.")
+        await ctx.author.send("Your identity has been recorded.")
         return
 
     @commands.command()
@@ -66,13 +66,13 @@ class Reporting(commands.Cog):
         author_hash = str(hash(ctx.author))
 
         if author_hash not in discord_ids:
-            await ctx.send("Your identity has not been recorded! Please use the !identity command")
+            await ctx.author.send("Your identity has not been recorded! Please use the !identity command")
             return
 
         raid_name_lower = raid_name.lower()
         raid_names = [ws.title for ws in get_raid_worksheets()]
         if raid_name_lower not in raid_names:
-            await ctx.send("That is not a valid raid! Please use !raids to see what raids are available.")
+            await ctx.author.send("That is not a valid raid! Please use !raids to see what raids are available.")
             return
 
         raid_worksheet = get_worksheet(raid_name_lower)
@@ -82,12 +82,12 @@ class Reporting(commands.Cog):
         names = col_values(raid_worksheet, 1)
 
         if name in names:
-            await ctx.send("You have already signed up for this raid!")
+            await ctx.author.send("You have already signed up for this raid!")
             return
 
         # hacky workaround for append row not working here
         insert_row(raid_worksheet, [name, wow_class, role, str(datetime.now())], len(names) + 1)
-        await ctx.send("Your availability has been noted for the upcoming raid.")
+        await ctx.author.send("Your availability has been noted for the upcoming raid.")
 
     @commands.command()
     async def onyattunement(self, ctx, attuned: bool):
@@ -104,9 +104,9 @@ class Reporting(commands.Cog):
         author_hash = str(hash(ctx.author))
 
         if author_hash not in discord_ids:
-            await ctx.send("Your identity has not been recorded! Please use the !identity command")
+            await ctx.author.send("Your identity has not been recorded! Please use the !identity command")
             return
 
         update_cell(identity_worksheet, discord_ids.index(author_hash) + 1, 6, str(attuned))
-        await ctx.send("Your attunement has been recorded.")
+        await ctx.author.send("Your attunement has been recorded.")
         return

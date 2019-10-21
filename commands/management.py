@@ -1,11 +1,16 @@
 import discord
 from discord.ext import commands
 
-from schema.emoji import get_emoji_map
 from sheets.client import *
 
 
+SIGNUP_EMOJI = "☑"
+CLOSE_SIGNUP_EMOJI ="🛑"
+BASE_RAID_DESCRIPTION = "React with your class or spec to register for the raid! Raid times are in server time (PST/PDT)"
+
+
 class Management(commands.Cog):
+
     """
     `Management` is a class that allows admin users to create raids for users
     """
@@ -28,6 +33,7 @@ class Management(commands.Cog):
         raid_title = "Raid - {} {}/{} @ {}".format(raid_name, raid_month, raid_date, raid_time).replace(":", "")
         safe_raid_name = raid_name.replace(" ", "-")
         channel_name = "{}-{}-{}".format(raid_title, raid_month, raid_date)
+        # If the sheet is already made for whatever reason, just get it
         try:
             worksheet = duplicate_sheet(raid_title)
         except APIError:
@@ -36,10 +42,11 @@ class Management(commands.Cog):
         embed = discord.Embed()
         embed.color = discord.Color.green()
         embed.title = raid_title
-        embed.description = "React with your class or spec to register for the raid! Raid times are in server time (PST/PDT)"
+        embed.description = BASE_RAID_DESCRIPTION
         embed.add_field(name="DPS", value=0)
         embed.add_field(name="Healer", value=0)
         embed.add_field(name="Tank", value=0)
+        embed.url = get_worksheet_link(worksheet)
 
         guild = ctx.message.guild
         categories = guild.categories
@@ -59,6 +66,5 @@ class Management(commands.Cog):
         channel = await category.create_text_channel(channel_name)
 
         msg = await channel.send(embed=embed)
-        for key in get_emoji_map().keys():
-            await msg.add_reaction(key)
+        await msg.add_reaction(SIGNUP_EMOJI)
         return
