@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
-from gspread.exceptions import APIError
 
-from DataProviders.JorachBotProvider import get_jorach
 from schema.emoji import get_emoji_map
 from sheets.client import *
 
@@ -12,12 +10,14 @@ class Management(commands.Cog):
     `Management` is a class that allows admin users to create raids for users
     """
 
-    @commands.command(name="startraid", description="Starts a new raid with a given name on a given date")
+    @commands.command()
     async def startraid(self, ctx, raid_name: str, raid_month: int, raid_date: int, raid_time: str):
         """
-        Registers the user in the spreadsheet provided all info is correct. Otherwise, informs the user that this
-        command failed due to their syntax.
+        Starts a new raid with a given name on a given date.
 
+        Example: TODO
+
+        DEVELOPER INFO:
         :param raid_name:
         :param raid_month:
         :param raid_date:

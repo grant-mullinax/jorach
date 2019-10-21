@@ -9,22 +9,24 @@ class Info(commands.Cog):
     `Info` is a class that contains a variety of info-providing commands.
     """
 
-    @commands.command(name="roles", description="Lists all available roles")
-    async def roles(self, ctx, params=None):
+    @commands.command()
+    async def roles(self, ctx):
         """
-        Informs the user on what roles are available for selection.
+        Shows what roles are available.
 
+        DEVELOPER INFO:
         :param ctx: The context of invocation for the command that sheet was ran on.
         :param params: No parameters are used.
         """
         await ctx.send("Valid roles are: %s" % ", ".join(get_all_roles()))
         return
 
-    @commands.command(name="raids", description="Lists all available raids")
+    @commands.command()
     async def raids(self, ctx):
         """
-        Sends a message informing the user what raids are currently available.
+        Shows what raids are available.
 
+        DEVELOPER INFO:
         :param ctx: The context of invocation for the command that sheet was ran on.
         :param params: No parameters are used.
         """
@@ -36,11 +38,12 @@ class Info(commands.Cog):
             await ctx.send("Available raids are:\n - %s" % ("\n - ".join(raid_names)))
         return
 
-    @commands.command(name="sheet", description="Provides a link to the registry spreadsheet")
-    async def run_command(self, ctx):
+    @commands.command()
+    async def sheet(self, ctx):
         """
-        Sends a message to the contextual channel with the spreadsheet where info is being recorded.
+        Links the current raid signup sheet.
 
+        DEVELOPER INFO:
         :param ctx: The context of invocation for the command that sheet was ran on.
         """
         await ctx.send("See the spreadsheet at:\n %s" % get_spreadsheet_link())

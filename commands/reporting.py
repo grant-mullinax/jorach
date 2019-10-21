@@ -13,13 +13,15 @@ class Reporting(commands.Cog):
     raid registration and signup system.
     """
 
-    @commands.command(name="identity", description="Registers your identity with the bot on the spreadsheet")
+    @commands.command()
     async def identity(self, ctx, name: str, wow_class: str, role: str):
         """
-        Registers the user in the spreadsheet provided all info is correct. Otherwise, informs the user that this
-        command failed due to their syntax.
+        Registers your character identity with the bot.
 
-        :param ctx: The context of invocation for the command that sheet was ran on.
+        Example: "!identity Jorach Rogue DPS"
+
+        DEVELOPER INFO:
+        :param ctx: The context of invocation for the command that identity was ran on.
         :param name: in-game character name
         :param wow_class: character class
         :param role: role of the character
@@ -48,13 +50,15 @@ class Reporting(commands.Cog):
         await ctx.send("Your identity has been recorded.")
         return
 
-    @commands.command(name="register", description="Signs you up for a given raid")
+    @commands.command()
     async def register(self, ctx, raid_name: str):
         """
-        Registers the user in the spreadsheet provided that they have identification and that they specified a valid
-        raid. Informs them if any of these assumptions is incorrect.
+        Used to register for a raid with an input name.
 
-        :param ctx: The context of invocation for the command that sheet was ran on.
+        Example: "!register mc1"
+
+        DEVELOPER INFO:
+        :param ctx: The context of invocation for the command that register was ran on.
         :param raid_name: the name of the raid to register for
         """
 
@@ -85,12 +89,14 @@ class Reporting(commands.Cog):
         insert_row(raid_worksheet, [name, wow_class, role, str(datetime.now())], len(names) + 1)
         await ctx.send("Your availability has been noted for the upcoming raid.")
 
-    @commands.command(name="onyattunement", description="Sets whether or not you are ony attuned")
+    @commands.command()
     async def onyattunement(self, ctx, attuned: bool):
         """
-        Sets the attunement status of the user provided that they have a valid identity registered. Otherwise, tells the
-        user how to set their identity up.
+        Used to set Onyxia attunement status to your identity.
 
+        Example: "!onyattunement Yes"
+
+        DEVELOPER INFO:
         :param ctx: The context of invocation for the command that sheet was ran on.
         :param attuned: whether or not the user is attuned.
         """
