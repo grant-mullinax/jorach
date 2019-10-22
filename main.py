@@ -141,7 +141,7 @@ async def on_raw_reaction_add(payload):
         discord_id, name, wow_class, role = identity_values[1:5]
         names = col_values(raid_worksheet, 1)
 
-        insert_row(raid_worksheet, [name, wow_class, role, str(datetime.now()), discord_id], len(names) + 1)
+        insert_row(raid_worksheet, [name, wow_class, role, str(datetime.now()), discord_id, author_hash], len(names) + 1)
 
         # end garbage
 
