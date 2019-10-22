@@ -87,11 +87,12 @@ def row_values(worksheet, index):
 def update_cell(worksheet, row_index, col_index, value):
     return worksheet.update_cell(row_index, col_index, value)
 
+
 def get_worksheet_link(worksheet):
     return "{}#gid={}".format(get_spreadsheet_link(), worksheet.id)
 
 
-_excluded_sheet_names = {"identity", "template"}
+_excluded_sheet_names = ["identity", "template"]
 
 __scope = ["https://spreadsheets.google.com/feeds",
            "https://www.googleapis.com/auth/drive"]

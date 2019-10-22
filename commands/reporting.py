@@ -40,13 +40,13 @@ class Reporting(commands.Cog):
         identity_worksheet = get_identity_worksheet()
 
         discord_ids = col_values(identity_worksheet, 1)
-        author_hash = str(hash(ctx.author))
+        author_id = str(ctx.author.id)
 
-        if author_hash in discord_ids:
-            delete_row(identity_worksheet, discord_ids.index(author_hash) + 1)  # sheets is indexed starting at 1
+        if author_id in discord_ids:
+            delete_row(identity_worksheet, discord_ids.index(author_id) + 1)  # sheets is indexed starting at 1
 
         append_row(identity_worksheet,
-            [author_hash, str(ctx.author), name.lower(), wow_class.lower(), role.lower()])
+            [author_id, str(ctx.author), name.lower(), wow_class.lower(), role.lower()])
         await ctx.author.send("Your identity has been recorded.")
         return
 
@@ -63,9 +63,9 @@ class Reporting(commands.Cog):
         """
 
         discord_ids = col_values(identity_worksheet, 1)
-        author_hash = str(hash(ctx.author))
+        author_id = str(ctx.author.id)
 
-        if author_hash not in discord_ids:
+        if author_id not in discord_ids:
             await ctx.author.send("Your identity has not been recorded! Please use the !identity command")
             return
 
@@ -76,7 +76,7 @@ class Reporting(commands.Cog):
             return
 
         raid_worksheet = get_worksheet(raid_name_lower)
-        identity_values = row_values(identity_worksheet, discord_ids.index(author_hash) + 1)
+        identity_values = row_values(identity_worksheet, discord_ids.index(author_id) + 1)
 
         name, wow_class, role = identity_values[2:5]
         names = col_values(raid_worksheet, 1)
@@ -101,12 +101,12 @@ class Reporting(commands.Cog):
         :param attuned: whether or not the user is attuned.
         """
         discord_ids = col_values(get_identity_worksheet(), 1)
-        author_hash = str(hash(ctx.author))
+        author_id = str(ctx.author.id)
 
-        if author_hash not in discord_ids:
+        if author_id not in discord_ids:
             await ctx.author.send("Your identity has not been recorded! Please use the !identity command")
             return
 
-        update_cell(identity_worksheet, discord_ids.index(author_hash) + 1, 6, str(attuned))
+        update_cell(identity_worksheet, discord_ids.index(author_id) + 1, 6, str(attuned))
         await ctx.author.send("Your attunement has been recorded.")
         return

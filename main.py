@@ -54,9 +54,9 @@ async def update_embed(msg: discord.Message, close=None):
     for role in roles:
         if role == "dps":
             dps += 1
-        elif role ==  "healer":
+        elif role == "healer":
             healer += 1
-        elif role ==  "tank":
+        elif role == "tank":
             tank += 1
     embed.set_field_at(0, name="DPS", value=dps)
     embed.set_field_at(1, name="Healers", value=healer)
@@ -133,7 +133,7 @@ async def on_raw_reaction_add(payload):
         # start garbage
 
         discord_ids = col_values(identity_worksheet, 1)
-        author_hash = str(hash(user))
+        author_hash = str(user.id)
 
         raid_worksheet = get_worksheet(embed.title)
         identity_values = row_values(identity_worksheet, discord_ids.index(author_hash) + 1)
