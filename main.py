@@ -63,8 +63,8 @@ async def update_embed(msg: discord.Message, close=None):
     embed.set_field_at(2, name="Tanks", value=tank)
     embed.description = BASE_RAID_DESCRIPTION
 
-    if dps+healer+tank >= 1:
-        embed.description += "\nThe raid is now full! Further responses will put you on the waitlist."
+    # if dps+healer+tank >= 1:
+    #    embed.description += "\nThe raid is now full! Further responses will put you on the waitlist."
 
     # Specifically check for False. None is a different state.
     if close == False:
