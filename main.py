@@ -1,5 +1,5 @@
 import configparser
-from datetime import datetime
+from scheduling.notifications import start_reminder_coroutine
 
 import discord
 
@@ -146,7 +146,6 @@ async def on_raw_reaction_add(payload):
         # end garbage
 
         await update_embed(msg)
-
 
 secret = config["keys"]["DiscordSecret"]
 bot.run(secret)

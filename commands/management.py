@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from datetime import datetime
 
 from sheets.client import *
 
@@ -16,7 +17,7 @@ class Management(commands.Cog):
     """
 
     @commands.command()
-    async def startraid(self, ctx, raid_name: str, raid_month: int, raid_date: int, raid_time: str):
+    async def startraid(self, ctx, raid_name: str, raid_month: int, raid_date: int, raid_hour: str, raid_min: str):
         """
         Starts a new raid with a given name on a given date.
 
@@ -26,11 +27,12 @@ class Management(commands.Cog):
         :param raid_name:
         :param raid_month:
         :param raid_date:
-        :param raid_time:
+        :param raid_hour:
+        :param raid_min:
         :param ctx: The context of invocation for the command that sheet was ran on.
         """
         # remove colons because it screws up some sheets calls, heh
-        raid_title = "Raid - {} {}/{} @ {}".format(raid_name, raid_month, raid_date, raid_time).replace(":", "")
+        raid_title = "Raid - {} {}/{} @ {}{}".format(raid_name, raid_month, raid_date, raid_hour, raid_min)
         safe_raid_name = raid_name.replace(" ", "-")
         channel_name = "{}-{}-{}".format(raid_title, raid_month, raid_date)
         # If the sheet is already made for whatever reason, just get it
@@ -38,6 +40,9 @@ class Management(commands.Cog):
             worksheet = duplicate_sheet(raid_title)
         except APIError:
             worksheet = get_worksheet(raid_title)
+
+        raid_datetime = datetime(datetime.now().year, int(raid_month), int(raid_date), int(raid_hour), int(raid_min))
+        update_cell(worksheet, 1, 26, raid_datetime.isoformat())
 
         embed = discord.Embed()
         embed.color = discord.Color.green()
