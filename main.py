@@ -81,7 +81,8 @@ async def on_raw_reaction_remove(payload):
     channel = bot.get_channel(payload.channel_id)
     msg = await channel.fetch_message(payload.message_id)
     user = await bot.fetch_user(payload.user_id)
-
+    guild = await bot.fetch_guild(payload.guild_id)
+    member = await guild.fetch_member(payload.user_id)
     if is_bot_raid_msg(msg, user):
         if str(payload.emoji) == SIGNUP_EMOJI:
             embed = msg.embeds[0]
@@ -94,7 +95,7 @@ async def on_raw_reaction_remove(payload):
                 # while the form is closed. Rather than barf out an error, consume it somehow.
                 await user.send("Sorry, signups for this raid are closed!")
             await update_embed(msg)
-        if str(payload.emoji) == CLOSE_SIGNUP_EMOJI:
+        if str(payload.emoji) == CLOSE_SIGNUP_EMOJI and channel.permissions_for(member).administrator:
             await update_embed(msg, close=False)
 
 
@@ -103,6 +104,8 @@ async def on_raw_reaction_add(payload):
     channel = bot.get_channel(payload.channel_id)
     msg = await channel.fetch_message(payload.message_id)
     user = await bot.fetch_user(payload.user_id)
+    guild = await bot.fetch_guild(payload.guild_id)
+    member = await guild.fetch_member(payload.user_id)
     if is_bot_raid_msg(msg, user):
         reactions = msg.reactions
         embed = msg.embeds[0]
@@ -116,7 +119,7 @@ async def on_raw_reaction_add(payload):
         # Fork the flow based on which of the signup emojis is sent. This is basically
         # a switch statement in the event pipeline here which is bad (could lead to a lot of branching)
         # but I don't understand the API enough yet to see a better way of handling this - Wangsly
-        if str(payload.emoji) == CLOSE_SIGNUP_EMOJI:
+        if str(payload.emoji) == CLOSE_SIGNUP_EMOJI and channel.permissions_for(member).administrator:
             await update_embed(msg, close=True)
             return
 

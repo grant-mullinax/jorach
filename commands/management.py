@@ -16,6 +16,7 @@ class Management(commands.Cog):
     """
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def startraid(self, ctx, raid_name: str, raid_month: int, raid_date: int, raid_time: str):
         """
         Starts a new raid with a given name on a given date.
