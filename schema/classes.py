@@ -6,7 +6,9 @@ class WowClass(Enum):
     hunter = "hunter"
     mage = "mage"
     paladin = "paladin"
+    priest = "priest"
     rogue = "rogue"
+    shaman = "shaman"
     warlock = "warlock"
     warrior = "warrior"
 
