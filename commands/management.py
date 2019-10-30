@@ -6,7 +6,10 @@ from sheets.client import *
 
 SIGNUP_EMOJI = "☑"
 CLOSE_SIGNUP_EMOJI ="🛑"
-BASE_RAID_DESCRIPTION = "React with your class or spec to register for the raid! Raid times are in server time (PST/PDT)"
+BASE_RAID_DESCRIPTION = \
+    ("React with %s to register for this raid! Raid times are in server time (PST/PDT)" % SIGNUP_EMOJI) \
+    + "\n\nNote that is is your responsibility to confirm that you have been signed up properly. If you run into an " \
+    + "issue while signing up, please contact a moderator."
 
 
 class Management(commands.Cog):
