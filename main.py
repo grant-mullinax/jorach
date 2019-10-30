@@ -1,14 +1,10 @@
-import configparser
 from datetime import datetime
-
-import discord
 
 from commands.info import Info
 from commands.reporting import Reporting
 from commands.management import *
 from providers.jorach_bot import get_jorach
 from schema.roles import Role
-from schema.specs import Spec
 from sheets.client import *
 
 # Load configuration info
@@ -139,7 +135,16 @@ async def on_raw_reaction_add(payload):
         author_hash = str(user.id)
 
         raid_worksheet = get_worksheet(embed.title)
-        identity_values = row_values(identity_worksheet, discord_ids.index(author_hash) + 1)
+
+        identity_values = None
+        try:
+            identity_values = row_values(identity_worksheet, discord_ids.index(author_hash) + 1)
+        except ValueError:
+            # TODO: Allow user to create an identity within messages from here
+            await user.send("Sorry, but you'll need to register an identity before you can sign up for a raid! Please "
+                            + "register your first (`!help identity`). After that, un-react and then re-react to "
+                            + "the raid signup post.")
+            return
 
         discord_id, name, wow_class, role = identity_values[1:5]
         names = col_values(raid_worksheet, 1)
