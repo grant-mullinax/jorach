@@ -138,7 +138,7 @@ async def on_raw_reaction_add(payload):
         if not user_profile_rows:
             # TODO: Allow user to create an identity within messages from here
             await user.send("Sorry, but you'll need to register an identity before you can sign up for a raid! Please "
-                            + "register your identity (`!help identity`). After that, un-react and then re-react to "
+                            + "register your identity (`!help addidentity`). After that, un-react and then re-react to "
                             + "the raid signup post.")
             return
 
