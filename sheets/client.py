@@ -92,6 +92,31 @@ def get_worksheet_link(worksheet):
     return "{}#gid={}".format(get_spreadsheet_link(), worksheet.id)
 
 
+def get_rows_with_value_in_column(worksheet, column_index, value_to_find, list_search_rows=None):
+    """
+    Returns a list of rows where the specified value is found in the input column.
+
+    By default, this searches through all rows.
+    If specific rows should be iterated through, they can be input via `list_search_rows`.
+
+    :param worksheet: The worksheet to search through
+    :param column_index: The column to search for the input value in
+    :param value_to_find: The value that should be found
+    :param list_search_rows: Optional: The 1-indexed list of rows that should be searched through.
+    :return: A list of 1-indexed rows where the value was found in the specific column.
+    """
+    cols_of_values = col_values(worksheet, column_index)
+
+    if list_search_rows:
+        # Filter; search each individual valid row
+        valid_rows = [row for row in list_search_rows if row - 1 < len(cols_of_values)]
+        return [row for row in valid_rows if cols_of_values[row - 1] == value_to_find]
+    else:
+        # No filter
+        # Get all rows with the specified value; +1 as gsheets is 1-indexed
+        return [index + 1 for index, value in enumerate(cols_of_values) if value == value_to_find]
+
+
 _excluded_sheet_names = ["identity", "template"]
 
 __scope = ["https://spreadsheets.google.com/feeds",

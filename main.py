@@ -71,7 +71,6 @@ async def update_embed(msg: discord.Message, close=None):
     await msg.edit(embed=embed)
 
 
-
 @bot.event
 async def on_raw_reaction_remove(payload):
     channel = bot.get_channel(payload.channel_id)
@@ -131,21 +130,52 @@ async def on_raw_reaction_add(payload):
 
         # start garbage
 
-        discord_ids = col_values(identity_worksheet, 1)
         author_hash = str(user.id)
 
         raid_worksheet = get_worksheet(embed.title)
 
-        identity_values = None
-        try:
-            identity_values = row_values(identity_worksheet, discord_ids.index(author_hash) + 1)
-        except ValueError:
+        user_profile_rows = get_rows_with_value_in_column(identity_worksheet, 1, author_hash)
+        if not user_profile_rows:
             # TODO: Allow user to create an identity within messages from here
             await user.send("Sorry, but you'll need to register an identity before you can sign up for a raid! Please "
-                            + "register your identity (`!help identity`). After that, un-react and then re-react to "
+                            + "register your identity (`!help addidentity`). After that, un-react and then re-react to "
                             + "the raid signup post.")
             return
 
+        chosen_row = None
+        if len(user_profile_rows) == 1:
+            # Only one row; auto-select the only row
+            chosen_row = user_profile_rows[0]
+        else:
+            # Multiple rows; have to ask user which alt they want to use
+            while not chosen_row:
+                # Set up mapping between the identity and the row
+                identity_to_row_map = {}
+                for row in user_profile_rows:
+                    # 2 is the 0-index of the name column in the identity sheet
+                    identity_to_row_map[row_values(identity_worksheet, row)[2].lower()] = row
+
+                user_identities = identity_to_row_map.keys()
+                await user.send(
+                    "Which identity would you like to sign up with?\nChoices: " + ", ".join(user_identities))
+
+                user_msg = \
+                    await bot.wait_for(
+                        "message", check=check_message_from_user(user), timeout=60)
+                user_choice = user_msg.content.lower().strip()
+                if not user_choice:
+                    # Operation timed out
+                    await user.send("Signup timed out. Please re-register to the raid to try again.")
+                    return
+
+                if user_choice not in user_identities:
+                    await user.send("Choice \"%s\" is not a valid choice. Please enter one of your known identities." %
+                                    user_choice)
+                else:
+                    chosen_row = identity_to_row_map[user_choice]
+            await user.send("Thank you! Your attendance has been recorded successfully.")
+
+        identity_values = row_values(identity_worksheet, chosen_row)
         discord_id, name, wow_class, role = identity_values[1:5]
         names = col_values(raid_worksheet, 1)
 
@@ -154,6 +184,13 @@ async def on_raw_reaction_add(payload):
         # end garbage
 
         await update_embed(msg)
+
+
+def check_message_from_user(user):
+    def inner_check(message):
+        return message.author == user
+
+    return inner_check
 
 
 secret = config["keys"]["DiscordSecret"]
