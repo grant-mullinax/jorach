@@ -4,21 +4,20 @@ from schema.classes import *
 from schema.roles import *
 from sheets.client import *
 
-from datetime import datetime
-
-
 class Reporting(commands.Cog):
     """
     `Reporting` is a class that contains a variety of commands that allow users to interact with the
     raid registration and signup system.
     """
 
-    @commands.command()
-    async def identity(self, ctx, name: str, wow_class: str, role: str):
+    @commands.command(name="addidentity")
+    async def add_identity(self, ctx, name: str, wow_class: str, role: str):
         """
-        Registers your character identity with the bot.
+        Registers a new character identity with the bot.
 
-        Example: "!identity Jorach Rogue DPS"
+        Example: "!addidentity Jorach Rogue DPS"
+
+        If you need to edit an identity, please use "!editidentity" instead.
 
         DEVELOPER INFO:
         :param ctx: The context of invocation for the command that identity was ran on.
@@ -26,87 +25,117 @@ class Reporting(commands.Cog):
         :param wow_class: character class
         :param role: role of the character
         """
-        classes = get_all_classes()
-        roles = get_all_roles()
 
-        if wow_class.lower() not in classes:
-            await ctx.author.send("Invalid class name, valid classes are {}".format(",".join(classes)))
+        if not is_valid_class(wow_class):
+            await ctx.author.send("Invalid class name, valid classes are {}".format(",".join(get_all_classes())))
             return
 
-        if role.lower() not in roles:
-            await ctx.author.send("Invalid role, valid roles are {}".format(", ".join(roles)))
+        if not is_valid_role(role):
+            await ctx.author.send("Invalid role, valid roles are {}".format(", ".join(get_all_roles())))
             return
 
         identity_worksheet = get_identity_worksheet()
-
-        discord_ids = col_values(identity_worksheet, 1)
         author_id = str(ctx.author.id)
 
-        if author_id in discord_ids:
-            delete_row(identity_worksheet, discord_ids.index(author_id) + 1)  # sheets is indexed starting at 1
+        rows_for_user_with_id = \
+            get_rows_with_value_in_column(identity_worksheet, column_index=1, value_to_find=author_id)
+        # quickly see if the row exists for the
 
-        append_row(identity_worksheet,
-            [author_id, str(ctx.author), name.lower(), wow_class.lower(), role.lower()])
-        await ctx.author.send("Your identity has been recorded.")
+        if rows_for_user_with_id:
+            # The user has other profiles; make sure they don't duplicate an entry with the same character name
+            rows_with_name_for_user_with_id = \
+                get_rows_with_value_in_column(identity_worksheet, column_index=3, value_to_find=name.lower(),
+                                              list_search_rows=rows_for_user_with_id)
+            if rows_with_name_for_user_with_id:
+                # Uh oh.. the user already registered a character with the same name! Tell them they STUPID.
+                await ctx.author.send(("Unable to add profile: You already have a character named \"%s\"; " % name)
+                                      + "did you mean to use `!editidentity`?")
+                return
+            # Else: User does not have a character with this name set up.
+
+        # User does not have a character with the same name; class and role valid. Can register a new profile
+        append_row(identity_worksheet, [author_id, str(ctx.author), name.lower(), wow_class.lower(), role.lower()])
+        await ctx.author.send("Your identity for character named \"%s\" was set up successfully." % name)
         return
 
-    @commands.command()
-    async def register(self, ctx, raid_name: str):
+    @commands.command(name="editidentity")
+    async def edit_identity(self, ctx, name: str, wow_class: str, role: str):
         """
-        Used to register for a raid with an input name.
+        Edits your identity as set up with the bot.
 
-        Example: "!register mc1"
+        Example: "!editidentity Jorach Mage Healer"
 
         DEVELOPER INFO:
-        :param ctx: The context of invocation for the command that register was ran on.
-        :param raid_name: the name of the raid to register for
+        :param ctx: The context of invocation for the command that identity was ran on.
+        :param name: in-game character name
+        :param wow_class: character class
+        :param role: role of the character
         """
+        if not is_valid_class(wow_class):
+            await ctx.author.send("Invalid class name, valid classes are {}".format(",".join(get_all_classes())))
+            return
 
-        discord_ids = col_values(identity_worksheet, 1)
+        if not is_valid_role(role):
+            await ctx.author.send("Invalid role, valid roles are {}".format(", ".join(get_all_roles())))
+            return
+
+        identity_worksheet = get_identity_worksheet()
         author_id = str(ctx.author.id)
 
-        if author_id not in discord_ids:
-            await ctx.author.send("Your identity has not been recorded! Please use the !identity command")
+        rows_for_user_with_id = \
+            get_rows_with_value_in_column(identity_worksheet, column_index=1, value_to_find=author_id)
+        # quickly see if the row exists for the
+
+        if not rows_for_user_with_id:
+            await ctx.author.send("Unable to edit identity: Could not find any identities to edit.")
             return
 
-        raid_name_lower = raid_name.lower()
-        raid_names = [ws.title for ws in get_raid_worksheets()]
-        if raid_name_lower not in raid_names:
-            await ctx.author.send("That is not a valid raid! Please use !raids to see what raids are available.")
+        # The user has other profiles; make sure a character with the name exists!
+        rows_with_name_for_user_with_id = \
+            get_rows_with_value_in_column(identity_worksheet, column_index=3, value_to_find=name.lower(),
+                                          list_search_rows=rows_for_user_with_id)
+        if len(rows_with_name_for_user_with_id) == 0:
+            await ctx.author.send(
+                "Unable to edit identity: Could not find any identities with name \"%s\" to edit." % name)
+            return
+        elif len(rows_with_name_for_user_with_id) > 1:
+            await ctx.author.send("Unable to edit identity: More than one record exists for identity named \"%s\"" %
+                                  name)
             return
 
-        raid_worksheet = get_worksheet(raid_name_lower)
-        identity_values = row_values(identity_worksheet, discord_ids.index(author_id) + 1)
+        # Delete the old record
+        delete_row(identity_worksheet, rows_with_name_for_user_with_id[0])
+        # Add the new one
+        append_row(identity_worksheet, [author_id, str(ctx.author), name.lower(), wow_class.lower(), role.lower()])
+        await ctx.author.send("Your identity was updated successfully!")
+        return
 
-        name, wow_class, role = identity_values[2:5]
-        names = col_values(raid_worksheet, 1)
-
-        if name in names:
-            await ctx.author.send("You have already signed up for this raid!")
-            return
-
-        # hacky workaround for append row not working here
-        insert_row(raid_worksheet, [name, wow_class, role, str(datetime.now())], len(names) + 1)
-        await ctx.author.send("Your availability has been noted for the upcoming raid.")
-
-    @commands.command()
-    async def onyattunement(self, ctx, attuned: bool):
-        """
-        Used to set Onyxia attunement status to your identity.
-
-        Example: "!onyattunement Yes"
-
-        DEVELOPER INFO:
-        :param ctx: The context of invocation for the command that sheet was ran on.
-        :param attuned: whether or not the user is attuned.
-        """
-        discord_ids = col_values(get_identity_worksheet(), 1)
+    @commands.command(name="removeidentity")
+    async def remove_identity(self, ctx, name: str):
+        identity_worksheet = get_identity_worksheet()
         author_id = str(ctx.author.id)
 
-        if author_id not in discord_ids:
-            await ctx.author.send("Your identity has not been recorded! Please use the !identity command")
+        rows_for_user_with_id = \
+            get_rows_with_value_in_column(identity_worksheet, column_index=1, value_to_find=author_id)
+
+        # Empty amount of rows; special error message for the user (would be caught in below loop, but i like separate
+        # better)
+        if not rows_for_user_with_id:
+            await ctx.author.send("Unable to delete identity: You do not have any profiles set up." % name)
             return
 
-        update_cell(identity_worksheet, discord_ids.index(author_id) + 1, 6, str(attuned))
-        await ctx.author.send("Your attunement has been recorded.")
+        # The user has other profiles; make sure a character with the name exists!
+        rows_with_name_for_user_with_id = \
+            get_rows_with_value_in_column(identity_worksheet, column_index=3, value_to_find=name.lower(),
+                                          list_search_rows=rows_for_user_with_id)
+        if len(rows_with_name_for_user_with_id) == 0:
+            await ctx.author.send("Unable to delete identity: Could not find a character named \"%s\"." % name)
+            return
+        elif len(rows_with_name_for_user_with_id) > 1:
+            await ctx.author.send("Unable to edit identity: More than one record exists for identity named \"%s\"" %
+                                  name)
+            return
+
+        delete_row(identity_worksheet, rows_with_name_for_user_with_id[0])
+        await ctx.author.send("Identity with name \"%s\" deleted successfully." % name)
         return
