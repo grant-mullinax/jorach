@@ -103,7 +103,7 @@ def get_rows_with_value_in_column(worksheet, column_index, value_to_find, list_s
     :param column_index: The column to search for the input value in
     :param value_to_find: The value that should be found
     :param list_search_rows: Optional: The 1-indexed list of rows that should be searched through.
-    :return: A list of rows where the value was found in the specific column.
+    :return: A list of 1-indexed rows where the value was found in the specific column.
     """
     cols_of_values = col_values(worksheet, column_index)
 
