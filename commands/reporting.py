@@ -112,6 +112,15 @@ class Reporting(commands.Cog):
 
     @commands.command(name="removeidentity")
     async def remove_identity(self, ctx, name: str):
+        """
+        Removes an identity associated to you by its name.
+
+        Example: "!removeidentity Jorach"
+
+        DEVELOPER INFO:
+        :param ctx: The context this command was invoked in
+        :param name: The name of the character to delete
+        """
         identity_worksheet = get_identity_worksheet()
         author_id = str(ctx.author.id)
 
