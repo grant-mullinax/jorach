@@ -48,6 +48,10 @@ def get_worksheet(worksheet_key):
     return spreadsheet.worksheet(worksheet_key)
 
 
+def delete_worksheet(worksheet_key):
+    spreadsheet.del_worksheet(get_worksheet(worksheet_key))
+
+
 def get_worksheets():
     return spreadsheet.worksheets()
 
