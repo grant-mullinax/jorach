@@ -10,7 +10,7 @@ BASE_RAID_DESCRIPTION = \
     ("React with %s to register for this raid! Raid times are in server time (PST/PDT)" % SIGNUP_EMOJI) \
     + "\n\nNote that is is your responsibility to confirm that you have been signed up properly. If you run into an " \
     + "issue while signing up, please contact a moderator."
-
+RAID_DRAWER_CATEGORY = "raids"
 
 class Management(commands.Cog):
 
@@ -56,10 +56,10 @@ class Management(commands.Cog):
         categories = guild.categories
         category = None
         for c in categories:
-            if c.name.lower() == "raids":
+            if c.name.lower() == RAID_DRAWER_CATEGORY:
                 category = c
         if category == None:
-            category = await guild.create_category("Raids")
+            category = await guild.create_category(RAID_DRAWER_CATEGORY)
 
         safe_raid_name = raid_name.replace(" ", "-")
         channel_name = "{}-{}-{}".format(safe_raid_name, raid_month, raid_date)
@@ -72,3 +72,18 @@ class Management(commands.Cog):
         msg = await channel.send(embed=embed)
         await msg.add_reaction(SIGNUP_EMOJI)
         return
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def deleteraid(self, ctx):
+        channel = ctx.channel
+        # Only delete channels in the `raids` category
+        if channel.category.name.lower() == RAID_DRAWER_CATEGORY:
+            async for message in channel.history(limit=1, oldest_first=True):
+                if len(message.embeds) > 0 and message.embeds[0].title.startswith("Raid -"):
+                    sheet_title = message.embeds[0].title
+                    try:
+                        delete_worksheet(sheet_title)
+                    except Exception:
+                        print("Can't find the sheet {}".format(sheet_title))
+                    await channel.delete()
