@@ -18,7 +18,7 @@ BASE_RAID_DESCRIPTION = \
     + "issue while signing up, please contact a moderator."
 
 
-START_HERE_CATEGORY = "welcome"
+START_HERE_CATEGORY = "General"
 START_HERE_CHANNEL = "start-here"
 
 RAID_TYPE_PUG = "Pug"
