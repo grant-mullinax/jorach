@@ -68,16 +68,6 @@ async def update_embed(msg: discord.Message):
     embed.set_field_at(1, name="Healers", value=healer)
     embed.set_field_at(2, name="Tanks", value=tank)
     embed.description = BASE_RAID_DESCRIPTION
-
-    # if dps+healer+tank >= 1:
-    #    embed.description += "\nThe raid is now full! Further responses will put you on the waitlist."
-
-    # Specifically check for False. None is a different state.
-    if close == False:
-        embed.color = discord.Color.green()
-    elif close == True:
-        embed.color = discord.Color.red()
-        embed.description += "\nSignups are closed!"
     await msg.edit(embed=embed)
 
 
@@ -132,14 +122,16 @@ async def raid_signup_helper(bot, channel, msg, user, guild, member, payload):
         try:
             # Set up mapping between the identity and the row
             identity_to_row_map = {}
+            user_identities = []
             for row in user_profile_rows:
                 # 2 is the 0-index of the name column in the identity sheet
-                identity_to_row_map[row_values(identity_worksheet, row)[2].lower()] = row
-
-            user_identities = identity_to_row_map.keys()
-            user_choice = prompt_choices("Which character would you like to sign up with?", user, user_identities)
+                k = row_values(identity_worksheet, row)[2].lower()
+                identity_to_row_map[k] = row
+                user_identities.append(k)
+            user_choice = await prompt_choices("Which character would you like to sign up with?", user, user_identities)
             chosen_row = identity_to_row_map[user_choice]
-        except:
+        except Exception as e:
+            print(e)
             await user.send("Oops! Something went wrong. Please try again!")
             return
         await user.send("Thank you! Your attendance has been recorded successfully.")
@@ -186,20 +178,20 @@ async def add_identity_helper(bot, channel, msg, user, guild, member, payload):
     # Attempt to attach both a class role and the "Raider" role by default.
     # The "Ravenguard" role MUST be added by an admin manually because we have no way of
     # programmatically verifying it.
-    r = None
-    class_r = None
+    raider_role = None
+    class_role = None
     for role in guild.roles:
         if str(role).lower() == RAIDER_ROLE_NAME:
-            r = role
+            raider_role = role
         elif str(role).lower() == wow_class.lower():
-            class_r = role
-        if class_r and r:
+            class_role = role
+        if class_role and raider_role:
             break
-    if not r:
-        r = await guild.create_role(name=RAIDER_ROLE_NAME)
-    if not class_r:
-        class_r = await guild.create_role(name=wow_class)
-    await member.add_roles(r, class_r)
+    if not raider_role:
+        raider_role = await guild.create_role(name=RAIDER_ROLE_NAME)
+    if not class_role:
+        class_role = await guild.create_role(name=wow_class)
+    await member.add_roles(raider_role, class_role)
     if not member.nick:
         try:
             await member.edit(nick=name)

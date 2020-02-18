@@ -18,6 +18,7 @@ def get_jorach():
     """
     return __bot
 
+
 async def prompt_freeform(msg: str, user: User) -> str:
     await user.send(msg)
     user_msg = await __bot.wait_for("message", check=check_message_from_user(user), timeout=60)
@@ -27,8 +28,14 @@ async def prompt_freeform(msg: str, user: User) -> str:
         raise Exception("Operation timed out.")
     return content
 
+
 async def prompt_choices(msg_header: str, user: User, choices: list):
-    msg = msg_header + "\nPlease select a choice by replying with the number of your selection"
+    """
+    Given a message, a user to communicate with, and a list of choices, prompt the user to select
+    a choice by giving the index of the selection (starting from 1)
+
+    """
+    msg = msg_header + "\nPlease select a choice by replying with the number of your selection."
     i = 1
     for choice in choices:
         part = "\n{}. {}".format(i, choice)
@@ -44,12 +51,11 @@ async def prompt_choices(msg_header: str, user: User, choices: list):
             raise Exception("Operation timed out.")
         try:
             idx = int(content)
-
-            if not idx in range(1, len(choices)):
+            if not idx in range(1, len(choices)+1):
                 raise ValueError("Index out of range: {}. Must be between 1 and {}".format(idx, len(choices)))
+            selection = choices[idx-1]
         except:
             await user.send("Invalid selection. Please specify a valid number.")
-        selection = choices[idx-1]
     return selection
 
 

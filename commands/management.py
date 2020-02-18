@@ -27,6 +27,21 @@ RAID_TYPE_INHOUSE = "inhouse"
 
 RAIDER_ROLE_NAME = "raider"
 
+MONTHS = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+]
+
 class Management(commands.Cog):
 
     """
@@ -70,8 +85,6 @@ class Management(commands.Cog):
         """
         Starts a new raid with a given name on a given date.
 
-        Example: TODO
-
         DEVELOPER INFO:
         :param ctx: The context of invocation for the command that sheet was ran on.
         """
@@ -81,9 +94,9 @@ class Management(commands.Cog):
         user = ctx.message.author
         try:
             while not finished:
-                raid_name = await prompt_freeform("What do you want to name the raid? " + \
-                "(One word, alphanumeric only, e.g. `rg1ony`)", user)
-                raid_month = await prompt_freeform("What month do you want to hold the raid (e.g. 1 through 12)?", user)
+                raid_name = await prompt_freeform("What do you want to name the raid?\n" + \
+                "(One word, alphanumeric only, e.g. `rg1ony` or `rg2bwl`)", user)
+                raid_month = MONTHS.index(await prompt_choices("What month do you want to host the raid?", user, MONTHS)) + 1
                 raid_date = await prompt_freeform("What date do you want to hold the raid (e.g. 1 through 31", user)
                 raid_time = await prompt_freeform("What time do you want to hold the raid? (Use military time, e.g. 18:30)", user)
                 raid_type = await prompt_choices("What type of raid is this?", user, [RAID_TYPE_INHOUSE, RAID_TYPE_PUG])
