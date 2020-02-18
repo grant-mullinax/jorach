@@ -97,11 +97,9 @@ class Management(commands.Cog):
                 raid_name = await prompt_freeform("What do you want to name the raid?\n" + \
                 "(One word, alphanumeric only, e.g. `rg1ony` or `rg2bwl`)", user)
                 raid_month = MONTHS.index(await prompt_choices("What month do you want to host the raid?", user, MONTHS)) + 1
-                raid_date = await prompt_freeform("What date do you want to hold the raid (e.g. 1 through 31", user)
+                raid_date = await prompt_freeform("What date do you want to hold the raid (e.g. 1 through 31)", user)
                 raid_time = await prompt_freeform("What time do you want to hold the raid? (Use military time, e.g. 18:30)", user)
                 raid_type = await prompt_choices("What type of raid is this?", user, [RAID_TYPE_INHOUSE, RAID_TYPE_PUG])
-                user_msg = await bot.wait_for("message", check=check_message_from_user(user), timeout=60)
-                raid_type = user_msg.content.lower().strip()
                 raid_category = None
                 if raid_type == RAID_TYPE_PUG:
                     raid_category = PUBLIC_RAID_DRAWER_CATEGORY
@@ -136,7 +134,7 @@ class Management(commands.Cog):
         guild = ctx.message.guild
         categories = guild.categories
         category = None
-        # Create the ca
+        # Create the category
         for c in categories:
             if c.name.lower() == raid_category:
                 category = c
