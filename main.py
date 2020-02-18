@@ -32,7 +32,6 @@ def is_bot_raid_msg(msg, user):
     return (msg.author.id == bot.user.id
             and user.id != bot.user.id
             and len(msg.embeds) > 0
-            and msg.embeds[0].title.startswith("Raid - ")
     )
 
 

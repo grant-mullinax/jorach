@@ -16,14 +16,25 @@ BASE_RAID_DESCRIPTION = \
     ("React with %s to register for this raid! Raid times are in server time (PST/PDT)" % SIGNUP_EMOJI) \
     + "\n\nNote that is is your responsibility to confirm that you have been signed up properly. If you run into an " \
     + "issue while signing up, please contact a moderator."
-PRIVATE_RAID_DRAWER_CATEGORY = "raids"
-PUBLIC_RAID_DRAWER_CATEGORY = "public raids"
+
 
 START_HERE_CATEGORY = "welcome"
 START_HERE_CHANNEL = "start-here"
 
-RAID_TYPE_PUG = "pug"
-RAID_TYPE_INHOUSE = "inhouse"
+RAID_TYPE_PUG = "Pug"
+RAID_TYPE_RG1 = "RG1"
+RAID_TYPE_RG2 = "RG2"
+
+RG1_RAID_DRAWER_CATEGORY = "RG1 Raids"
+RG2_RAID_DRAWER_CATEGORY = "RG2 Raids"
+PUBLIC_RAID_DRAWER_CATEGORY = "Public Raids"
+
+RAID_TYPE_DRAWER_MAP = {
+    RAID_TYPE_PUG: PUBLIC_RAID_DRAWER_CATEGORY,
+    RAID_TYPE_RG1: RG1_RAID_DRAWER_CATEGORY,
+    RAID_TYPE_RG2: RG2_RAID_DRAWER_CATEGORY,
+}
+
 
 RAIDER_ROLE_NAME = "raider"
 
@@ -95,27 +106,23 @@ class Management(commands.Cog):
         try:
             while not finished:
                 raid_name = await prompt_freeform("What do you want to name the raid?\n" + \
-                "(One word, alphanumeric only, e.g. `rg1ony` or `rg2bwl`)", user)
+                "(One word, alphanumeric only, e.g. `ony` or `bwl`)", user)
                 raid_month = MONTHS.index(await prompt_choices("What month do you want to host the raid?", user, MONTHS)) + 1
                 raid_date = await prompt_freeform("What date do you want to hold the raid (e.g. 1 through 31)", user)
                 raid_time = await prompt_freeform("What time do you want to hold the raid? (Use military time, e.g. 18:30)", user)
-                raid_type = await prompt_choices("What type of raid is this?", user, [RAID_TYPE_INHOUSE, RAID_TYPE_PUG])
-                raid_category = None
-                if raid_type == RAID_TYPE_PUG:
-                    raid_category = PUBLIC_RAID_DRAWER_CATEGORY
-                elif raid_type == RAID_TYPE_INHOUSE:
-                    raid_category = PRIVATE_RAID_DRAWER_CATEGORY
-                else:
-                    await user.send("Invalid raid type. Must be either 'pug' or 'inhouse'")
+                raid_type = await prompt_choices("What type of raid is this?", user, list(RAID_TYPE_DRAWER_MAP.keys()))
+                raid_category = RAID_TYPE_DRAWER_MAP.get(raid_type, None)
+                if not raid_category:
+                    await user.send("Invalid raid type.")
                     return
                 finished = True
         except:
             await user.send("Oops! Something went wrong. Please try again.")
             return
 
-        raid_title = "Raid - {} {}/{} @ {}".format(raid_name, raid_month, raid_date, raid_time).replace(":", "")
+        raid_title = "{} - {} {}/{} @ {}".format(raid_type, raid_name, raid_month, raid_date, raid_time).replace(":", "")
         safe_raid_name = raid_name.replace(" ", "-")
-        channel_name = "{}-{}-{}".format(raid_title, raid_month, raid_date)
+        channel_name = "{}-{}-{}".format(raid_month, raid_date, raid_name)
         # If the sheet is already made for whatever reason, just get it
         try:
             worksheet = duplicate_sheet(raid_title)
@@ -141,8 +148,6 @@ class Management(commands.Cog):
         if category == None:
             category = await guild.create_category(raid_category)
 
-        safe_raid_name = raid_name.replace(" ", "-")
-        channel_name = "{}-{}-{}".format(safe_raid_name, raid_month, raid_date)
         for c in category.channels:
             if c.name == channel_name:
                 print("Already have a channel with this name, cancelling")
@@ -159,9 +164,10 @@ class Management(commands.Cog):
     async def deleteraid(self, ctx):
         channel = ctx.channel
         # Only delete channels in the raid categories
-        if channel.category.name.lower() in [PRIVATE_RAID_DRAWER_CATEGORY, PUBLIC_RAID_DRAWER_CATEGORY]:
+        print([v.lower() for v in RAID_TYPE_DRAWER_MAP.values()])
+        if channel.category.name.lower() in [v.lower() for v in RAID_TYPE_DRAWER_MAP.values()]:
             async for message in channel.history(limit=1, oldest_first=True):
-                if len(message.embeds) > 0 and message.embeds[0].title.startswith("Raid -"):
+                if len(message.embeds) > 0:
                     sheet_title = message.embeds[0].title
                     try:
                         delete_worksheet(sheet_title)
