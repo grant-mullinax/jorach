@@ -1,3 +1,5 @@
+from datetime import date, datetime, timedelta
+
 from discord.ext import commands
 
 from schema.roles import get_all_roles
@@ -8,6 +10,20 @@ class Info(commands.Cog):
     """
     `Info` is a class that contains a variety of info-providing commands.
     """
+    @commands.command()
+    async def ony(self, ctx):
+        """
+        Shows when the next Onyxia reset is.
+
+        DEVELOPER INFO:
+        :param ctx: The context of invocation
+        :param params: No parameters are used.
+        """
+        seed_date = datetime.strptime("1/5/20", "%m/%d/%y")
+        today = datetime.combine(date.today(), datetime.min.time())
+        days_until_ony = 5 - (today - seed_date).days % 5
+        onyxia_time = today + timedelta(days=days_until_ony)
+        await ctx.send("The next Onyxia reset is on {}".format(onyxia_time.strftime("%A %b %d")))
 
     @commands.command()
     async def roles(self, ctx):
