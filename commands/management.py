@@ -148,7 +148,6 @@ class Management(commands.Cog):
     async def deleteraid(self, ctx):
         channel = ctx.channel
         # Only delete channels in the raid categories
-        print([v.lower() for v in RAID_TYPE_DRAWER_MAP.values()])
         if channel.category.name.lower() in [v.lower() for v in RAID_TYPE_DRAWER_MAP.values()]:
             async for message in channel.history(limit=1, oldest_first=True):
                 if len(message.embeds) > 0:
