@@ -11,7 +11,7 @@ class Info(commands.Cog):
     `Info` is a class that contains a variety of info-providing commands.
     """
     @commands.command()
-    async def onyxia(self, ctx):
+    async def ony(self, ctx):
         """
         Shows when the next Onyxia reset is.
 
@@ -23,8 +23,7 @@ class Info(commands.Cog):
         today = datetime.combine(date.today(), datetime.min.time())
         days_until_ony = 5 - (today - seed_date).days % 5
         onyxia_time = today + timedelta(days=days_until_ony)
-        await ctx.send("The next Onyxia reset is on: {} at 11AM server time (PST)".format(
-            onyxia_time.strftime("%A %b %d")))
+        await ctx.send("The next Onyxia reset is on {}".format(onyxia_time.strftime("%A %b %d")))
 
     @commands.command()
     async def roles(self, ctx):
