@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from providers.jorach_bot import get_jorach
+from providers.jorach_bot import *
 from sheets.client import *
 
 
@@ -32,10 +32,12 @@ class Management(commands.Cog):
     """
     `Management` is a class that allows admin users to create raids for users
     """
-
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def bootstrap(self, ctx):
+        """
+        Bootstraps the channels for welcoming new users if necessary.
+        """
         # First, let's create the category if it's not already there.
         guild = ctx.message.guild
         categories = guild.categories
@@ -77,59 +79,28 @@ class Management(commands.Cog):
         bot = get_jorach()
         finished = False
         user = ctx.message.author
-        while not finished:
-            await user.send("""
-            What do you want to name the raid?
-            """)
-            user_msg = await bot.wait_for("message", check=check_message_from_user(user), timeout=60)
-            raid_name = user_msg.content.lower().strip()
-            if not raid_name:
-                await user.send("Operation timed out. Please start the flow again")
-                return
-
-            await user.send("""
-            What month do you want to hold the raid (e.g. 1 through 12)?
-            """)
-            user_msg = await bot.wait_for("message", check=check_message_from_user(user), timeout=60)
-            raid_month = user_msg.content.lower().strip()
-            if not raid_month:
-                await user.send("Operation timed out. Please start the flow again")
-                return
-
-            await user.send("""
-            What date do you want to hold the raid (e.g. 1 through 31)?
-            """)
-            user_msg = await bot.wait_for("message", check=check_message_from_user(user), timeout=60)
-            raid_date = user_msg.content.lower().strip()
-            if not raid_date:
-                await user.send("Operation timed out. Please start the flow again")
-                return
-
-            await user.send("""
-            What time do you want to hold the raid (e.g. 18:30)?
-            """)
-            user_msg = await bot.wait_for("message", check=check_message_from_user(user), timeout=60)
-            raid_time = user_msg.content.lower().strip()
-            if not raid_time:
-                await user.send("Operation timed out. Please start the flow again")
-                return
-            await user.send("""
-            Is this raid a pug or an inhouse?
-            """)
-            user_msg = await bot.wait_for("message", check=check_message_from_user(user), timeout=60)
-            raid_type = user_msg.content.lower().strip()
-            if not raid_time:
-                await user.send("Operation timed out. Please start the flow again")
-                return
-            raid_category = None
-            if raid_type == RAID_TYPE_PUG:
-                raid_category = PUBLIC_RAID_DRAWER_CATEGORY
-            elif raid_type == RAID_TYPE_INHOUSE:
-                raid_category = PRIVATE_RAID_DRAWER_CATEGORY
-            else:
-                await user.send("Invalid raid type. Must be either 'pug' or 'inhouse'")
-                return
-            finished = True
+        try:
+            while not finished:
+                raid_name = await prompt_freeform("What do you want to name the raid? " + \
+                "(One word, alphanumeric only, e.g. `rg1ony`)", user)
+                raid_month = await prompt_freeform("What month do you want to hold the raid (e.g. 1 through 12)?", user)
+                raid_date = await prompt_freeform("What date do you want to hold the raid (e.g. 1 through 31", user)
+                raid_time = await prompt_freeform("What time do you want to hold the raid? (Use military time, e.g. 18:30)", user)
+                raid_type = await prompt_choices("What type of raid is this?", user, [RAID_TYPE_INHOUSE, RAID_TYPE_PUG])
+                user_msg = await bot.wait_for("message", check=check_message_from_user(user), timeout=60)
+                raid_type = user_msg.content.lower().strip()
+                raid_category = None
+                if raid_type == RAID_TYPE_PUG:
+                    raid_category = PUBLIC_RAID_DRAWER_CATEGORY
+                elif raid_type == RAID_TYPE_INHOUSE:
+                    raid_category = PRIVATE_RAID_DRAWER_CATEGORY
+                else:
+                    await user.send("Invalid raid type. Must be either 'pug' or 'inhouse'")
+                    return
+                finished = True
+        except:
+            await user.send("Oops! Something went wrong. Please try again.")
+            return
 
         raid_title = "Raid - {} {}/{} @ {}".format(raid_name, raid_month, raid_date, raid_time).replace(":", "")
         safe_raid_name = raid_name.replace(" ", "-")
@@ -176,7 +147,7 @@ class Management(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def deleteraid(self, ctx):
         channel = ctx.channel
-        # Only delete channels in the `raids` category
+        # Only delete channels in the raid categories
         if channel.category.name.lower() in [PRIVATE_RAID_DRAWER_CATEGORY, PUBLIC_RAID_DRAWER_CATEGORY]:
             async for message in channel.history(limit=1, oldest_first=True):
                 if len(message.embeds) > 0 and message.embeds[0].title.startswith("Raid -"):
@@ -184,12 +155,5 @@ class Management(commands.Cog):
                     try:
                         delete_worksheet(sheet_title)
                     except Exception:
-                        print("Can't find the sheet {}".format(sheet_title))
+                        await ctx.message.author.send("Failed to delete the associated sheet: {}".format(sheet_title))
                     await channel.delete()
-
-
-def check_message_from_user(user):
-    def inner_check(message):
-        return message.author == user
-
-    return inner_check

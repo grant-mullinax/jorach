@@ -111,27 +111,15 @@ async def raid_signup_helper(bot, channel, msg, user, guild, member, payload):
         await msg.remove_reaction(payload.emoji, user)
         return
 
-    # await register_for_raid(channel, user, embed.title)
-
-    # i started reworking the whole command system thing and got here last and realized why you split the
-    # functionality out of the register class. whoops. ultimately though I think we'll need a different way
-    # of talking to the user because spamming the raid registration channel with error messages or confirmations
-    # will make the raid message hard to find, so I got rid of all the error reporting and just slapped it here.
-    # eventually we'll want to split this and what happens in register off into its own thing to prevent
-    # code duplication. the plan is to just have it throw exceptions on the errors (like no identity)
-    # and just let whatever is calling it deal with relaying that to the user
-
-    # start garbage
-
     author_hash = str(user.id)
-
     raid_worksheet = get_worksheet(embed.title)
-
     user_profile_rows = get_rows_with_value_in_column(identity_worksheet, 1, author_hash)
     if not user_profile_rows:
+        # (Wangsly): This might be defunct now. You should no longer be able to see raid channels until
+        # you have signed up at least one character. Once we've confirmed, let's remove this block.
         # TODO: Allow user to create an identity within messages from here
         await user.send("Sorry, but you'll need to register an identity before you can sign up for a raid! Please "
-                        + "register your identity (`!help addidentity`). After that, un-react and then re-react to "
+                        + "register your identity in the start-here channel. After that, un-react and then re-react to "
                         + "the raid signup post.")
         return
 
@@ -141,7 +129,7 @@ async def raid_signup_helper(bot, channel, msg, user, guild, member, payload):
         chosen_row = user_profile_rows[0]
     else:
         # Multiple rows; have to ask user which alt they want to use
-        while not chosen_row:
+        try:
             # Set up mapping between the identity and the row
             identity_to_row_map = {}
             for row in user_profile_rows:
@@ -149,23 +137,11 @@ async def raid_signup_helper(bot, channel, msg, user, guild, member, payload):
                 identity_to_row_map[row_values(identity_worksheet, row)[2].lower()] = row
 
             user_identities = identity_to_row_map.keys()
-            await user.send(
-                "Which identity would you like to sign up with?\nChoices: " + ", ".join(user_identities))
-
-            user_msg = \
-                await bot.wait_for(
-                    "message", check=check_message_from_user(user), timeout=60)
-            user_choice = user_msg.content.lower().strip()
-            if not user_choice:
-                # Operation timed out
-                await user.send("Signup timed out. Please re-register to the raid to try again.")
-                return
-
-            if user_choice not in user_identities:
-                await user.send("Choice \"%s\" is not a valid choice. Please enter one of your known identities." %
-                                user_choice)
-            else:
-                chosen_row = identity_to_row_map[user_choice]
+            user_choice = prompt_choices("Which character would you like to sign up with?", user, user_identities)
+            chosen_row = identity_to_row_map[user_choice]
+        except:
+            await user.send("Oops! Something went wrong. Please try again!")
+            return
         await user.send("Thank you! Your attendance has been recorded successfully.")
 
     identity_values = row_values(identity_worksheet, chosen_row)
@@ -206,7 +182,10 @@ async def add_identity_helper(bot, channel, msg, user, guild, member, payload):
     except:
         user.send("Oops, something went wrong! Please try again.")
         return
-    await user.send("Your identity for character named \"%s\" was set up successfully." % name)
+
+    # Attempt to attach both a class role and the "Raider" role by default.
+    # The "Ravenguard" role MUST be added by an admin manually because we have no way of
+    # programmatically verifying it.
     r = None
     class_r = None
     for role in guild.roles:
@@ -231,6 +210,8 @@ async def add_identity_helper(bot, channel, msg, user, guild, member, payload):
 
     # User does not have a character with the same name; class and role valid. Can register a new profile
     append_row(identity_worksheet, [author_id, str(user), name.lower(), wow_class.lower(), wow_role.lower()])
+    await user.send("\"%s\" registered successfully." % name)
+
 
 
 

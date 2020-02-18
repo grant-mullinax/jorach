@@ -44,7 +44,8 @@ async def prompt_choices(msg_header: str, user: User, choices: list):
             raise Exception("Operation timed out.")
         try:
             idx = int(content)
-            if not (idx < len(choices) + 1):
+
+            if not idx in range(1, len(choices)):
                 raise ValueError("Index out of range: {}. Must be between 1 and {}".format(idx, len(choices)))
         except:
             await user.send("Invalid selection. Please specify a valid number.")
