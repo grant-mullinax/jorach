@@ -65,15 +65,7 @@ class Management(commands.Cog):
         Bootstraps the channels for welcoming new users if necessary.
         """
         # First, let's create the category if it's not already there.
-        guild = ctx.message.guild
-        categories = guild.categories
-        category = None
-        # Create the category if it's not already there.
-        for c in categories:
-            if c.name.lower() == START_HERE_CATEGORY:
-                category = c
-        if category == None:
-            category = await guild.create_category(START_HERE_CATEGORY)
+        category = await self.create_category_if_not_exists(ctx, START_HERE_CATEGORY)
 
         # Do nothing if the channel is already made
         for c in category.channels:
@@ -138,15 +130,7 @@ class Management(commands.Cog):
         embed.add_field(name="Tank", value=0)
         embed.url = get_worksheet_link(worksheet)
 
-        guild = ctx.message.guild
-        categories = guild.categories
-        category = None
-        # Create the category
-        for c in categories:
-            if c.name.lower() == raid_category:
-                category = c
-        if category == None:
-            category = await guild.create_category(raid_category)
+        category = await self.create_category_if_not_exists(ctx, raid_category)
 
         for c in category.channels:
             if c.name == channel_name:
@@ -174,3 +158,15 @@ class Management(commands.Cog):
                     except Exception:
                         await ctx.message.author.send("Failed to delete the associated sheet: {}".format(sheet_title))
                     await channel.delete()
+
+    async def create_category_if_not_exists(self, ctx, category_name):
+        guild = ctx.message.guild
+        categories = guild.categories
+        category = None
+        # Create the category
+        for c in categories:
+            if c.name.lower() == category_name.lower():
+                category = c
+        if category == None:
+            category = await guild.create_category(category_name)
+        return category

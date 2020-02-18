@@ -28,16 +28,19 @@ async def on_ready():
     print("------")
 
 
-def is_bot_raid_msg(msg, user):
+def is_bot_raid_msg(msg, channel, user):
     return (msg.author.id == bot.user.id
             and user.id != bot.user.id
             and len(msg.embeds) > 0
+            and channel.category.name.lower() in [v.lower() for v in RAID_TYPE_DRAWER_MAP.values()]
+            and any([msg.embeds[0].title.startswith(k) for k in list(RAID_TYPE_DRAWER_MAP.keys())])
     )
 
 
-def is_bot_identity_welcome_msg(msg, user):
+def is_bot_identity_welcome_msg(msg, channel, user):
     return (msg.author.id == bot.user.id
             and user.id != bot.user.id
+            and channel.category.name == START_HERE_CATEGORY
             and len(msg.embeds) > 0
             and msg.embeds[0].title == IDENTITY_EMBED_TITLE
     )
@@ -72,12 +75,8 @@ async def update_embed(msg: discord.Message):
 
 @bot.event
 async def on_raw_reaction_remove(payload):
-    channel = bot.get_channel(payload.channel_id)
-    msg = await channel.fetch_message(payload.message_id)
-    user = await bot.fetch_user(payload.user_id)
-    guild = await bot.fetch_guild(payload.guild_id)
-    member = await guild.fetch_member(payload.user_id)
-    if is_bot_raid_msg(msg, user):
+    channel, msg, user, guild, member = await parse_objs_from_payload(payload)
+    if is_bot_raid_msg(msg, channel, user):
         if str(payload.emoji) == SIGNUP_EMOJI:
             embed = msg.embeds[0]
             raid_worksheet = get_worksheet(embed.title)
@@ -87,7 +86,7 @@ async def on_raw_reaction_remove(payload):
             except ValueError:
                 # We might try to delete a raider ID that doesn't exist because they are trying to signup
                 # while the form is closed. Rather than barf out an error, consume it somehow.
-                await user.send("Sorry, something went wrong!")
+                pass
             await update_embed(msg)
 
 
@@ -204,26 +203,22 @@ async def add_identity_helper(bot, channel, msg, user, guild, member, payload):
     await user.send("\"%s\" registered successfully." % name)
 
 
-
-
 @bot.event
 async def on_raw_reaction_add(payload):
+    channel, msg, user, guild, member = await parse_objs_from_payload(payload)
+    if is_bot_raid_msg(msg, channel, user):
+        await raid_signup_helper(bot, channel, msg, user, guild, member, payload)
+    elif is_bot_identity_welcome_msg(msg, channel, user):
+        await add_identity_helper(bot, channel, msg, user, guild, member, payload)
+
+
+async def parse_objs_from_payload(payload):
     channel = bot.get_channel(payload.channel_id)
     msg = await channel.fetch_message(payload.message_id)
     user = bot.get_user(payload.user_id)
     guild = bot.get_guild(payload.guild_id)
     member = guild.get_member(payload.user_id)
-    if is_bot_raid_msg(msg, user):
-        await raid_signup_helper(bot, channel, msg, user, guild, member, payload)
-    elif is_bot_identity_welcome_msg(msg, user):
-        await add_identity_helper(bot, channel, msg, user, guild, member, payload)
-
-def check_message_from_user(user):
-    def inner_check(message):
-        return message.author == user
-
-    return inner_check
-
+    return (channel, msg, user, guild, member)
 
 secret = config["keys"]["DiscordSecret"]
 bot.run(secret)
