@@ -33,7 +33,7 @@ def is_bot_raid_msg(msg, channel, user):
             and user.id != bot.user.id
             and len(msg.embeds) > 0
             and channel.category.name.lower() in [v.lower() for v in RAID_TYPE_DRAWER_MAP.values()]
-            and any([msg.embeds[0].title.startswith(k) for k in list(RAID_TYPE_DRAWER_MAP.keys())])
+            and (any([msg.embeds[0].title.startswith(k) for k in list(RAID_TYPE_DRAWER_MAP.keys())]) or msg.embeds[0].title.startswith("Raid"))
     )
 
 
