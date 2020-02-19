@@ -30,8 +30,8 @@ async def edit_identity(bot, channel, msg, user, guild, member, payload):
         if not user_rows:
             raise Exception("Unable to edit identity: Could not find any identities to edit.")
 
-        character_names = [row_values(identity_worksheet, row)[3].lower() for row in user_rows]
-        name = prompt_choices("Which identity would you like to edit?", character_names)
+        character_names = [row_values(identity_worksheet, row)[2].lower() for row in user_rows]
+        name = await prompt_choices("Which identity would you like to edit?", user, character_names)
         wow_class = await prompt_choices("What is your class?", user, get_all_classes())
         wow_role = await prompt_choices("What is your role?", user, get_class_roles(wow_class))
 

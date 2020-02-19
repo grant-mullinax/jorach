@@ -3,15 +3,15 @@ from schema.roles import Role
 
 
 CLASS_ROLE_MAP = {
-    "druid": [Role.dps, Role.healer, Role.tank],
-    "hunter": [Role.dps],
-    "mage": [Role.dps],
-    "paladin": [Role.dps, Role.healer, Role.tank],
-    "priest": [Role.dps, Role.healer],
-    "rogue": [Role.dps],
-    "shaman": [Role.dps, Role.healer],
-    "warlock": [Role.dps],
-    "warrior": [Role.dps, Role.tank],
+    "druid": [Role.dps.value, Role.healer.value, Role.tank.value],
+    "hunter": [Role.dps.value],
+    "mage": [Role.dps.value],
+    "paladin": [Role.dps.value, Role.healer.value, Role.tank.value],
+    "priest": [Role.dps.value, Role.healer.value],
+    "rogue": [Role.dps.value],
+    "shaman": [Role.dps.value, Role.healer.value],
+    "warlock": [Role.dps.value],
+    "warrior": [Role.dps.value, Role.tank.value],
 }
 
 

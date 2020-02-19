@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 
 from discord.ext import commands
 
@@ -19,12 +19,15 @@ class Info(commands.Cog):
         :param ctx: The context of invocation
         :param params: No parameters are used.
         """
-        tz = timezone(timedelta(hours=-7))
-        seed_date = datetime.strptime("1/5/20", "%m/%d/%y").astimezone(tz)
-        today = datetime.combine(date.today(), datetime.min.time()).astimezone(tz)
+        seed_date = datetime.strptime("1/5/20", "%m/%d/%y")
+        today = datetime.combine(date.today(), datetime.min.time())
         days_until_ony = 5 - (today - seed_date).days % 5
         onyxia_time = today + timedelta(days=days_until_ony)
-        await ctx.send("The next Onyxia reset is on {}".format(onyxia_time.strftime("%A %b %d")))
+        prev_ony = onyxia_time + timedelta(days=-5)
+        await ctx.send("The next Onyxia reset is on {}\nThe previous reset was on {}".format(
+            onyxia_time.strftime("%A %b %d"),
+            prev_ony.strftime("%A %b %d"),
+        ))
 
     @commands.command()
     async def raids(self, ctx):

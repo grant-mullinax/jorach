@@ -21,8 +21,6 @@ async def add_identity(bot, channel, msg, user, guild, member, payload):
     """
     Set up a user identity from info parsed out of a reaction to a message
     """
-    # Remove the reaction immediately. We just want the button there to trigger the flow.
-    await msg.remove_reaction(payload.emoji, user)
     member_id = str(member.id)
 
     # Gather and validate user info.

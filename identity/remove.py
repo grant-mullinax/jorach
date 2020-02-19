@@ -25,13 +25,12 @@ async def remove_identity(bot, channel, msg, user, guild, member, payload):
     if not user_rows:
         raise Exception("Unable to delete identity: You do not have any profiles set up.")
 
-    character_names = [row_values(identity_worksheet, row)[3].lower() for row in user_rows]
-    name = prompt_choices("Which character would you like to delete?", character_names)
+    character_names = [row_values(identity_worksheet, row)[2].lower() for row in user_rows]
+    name = await prompt_choices("Which character would you like to delete?", user, character_names)
 
     # The user has other profiles; make sure a character with the name exists!
-    matching_rows = \
-        get_rows_with_value_in_column(identity_worksheet, column_index=3, value_to_find=name.lower(),
-                                        list_search_rows=user_rows)
+    matching_rows = get_rows_with_value_in_column(identity_worksheet, column_index=3,
+        value_to_find=name.lower(), list_search_rows=user_rows)
     if len(matching_rows) > 1:
         raise Exception("Unable to edit identity: More than one record exists for identity named `{}`".format(name))
         return

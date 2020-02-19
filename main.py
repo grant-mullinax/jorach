@@ -1,8 +1,7 @@
 from datetime import datetime
 
 from commands.info import Info
-from commands.management import Management
-from commands.reporting import Reporting
+from commands.raid_management import Management
 from identity.add import add_identity, is_bot_add_identity_msg
 from identity.edit import edit_identity, is_bot_edit_identity_msg
 from identity.remove import is_bot_remove_identity_msg, remove_identity
@@ -19,7 +18,6 @@ config.read_file(open('config.ini'))
 # Get bot and register commands
 bot = get_jorach()
 bot.add_cog(Info())
-bot.add_cog(Reporting())
 bot.add_cog(Management())
 
 
@@ -35,7 +33,7 @@ async def on_ready():
 async def on_raw_reaction_remove(payload):
     channel, msg, user, guild, member = await parse_objs_from_payload(payload)
     if is_bot_raid_signup_msg(bot, msg, channel, user):
-        remove_raid_signup(bot, channel, msg, user, guild, member, payload)
+        await remove_raid_signup(bot, channel, msg, user, guild, member, payload)
 
 
 @bot.event
@@ -44,10 +42,13 @@ async def on_raw_reaction_add(payload):
     if is_bot_raid_signup_msg(bot, msg, channel, user):
         await raid_signup(bot, channel, msg, user, guild, member, payload)
     elif is_bot_add_identity_msg(bot, msg, channel, user):
+        await msg.remove_reaction(payload.emoji, user)
         await add_identity(bot, channel, msg, user, guild, member, payload)
     elif is_bot_edit_identity_msg(bot, msg, channel, user):
+        await msg.remove_reaction(payload.emoji, user)
         await edit_identity(bot, channel, msg, user, guild, member, payload)
     elif is_bot_remove_identity_msg(bot, msg, channel, user):
+        await msg.remove_reaction(payload.emoji, user)
         await remove_identity(bot, channel, msg, user, guild, member, payload)
 
 

@@ -16,6 +16,8 @@ class Management(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def bootstrap(self, ctx):
         """
+
+        DEVELOPER INFO:
         Bootstraps the channels for welcoming new users if necessary.
         """
         # First, let's create the category if it's not already there.
@@ -28,40 +30,38 @@ class Management(commands.Cog):
 
         channel = await category.create_text_channel(START_HERE_CHANNEL)
 
-        self._post_add_identity_embed(channel)
-        self._post_edit_identity_embed(channel)
-        self._post_remove_identity_embed(channel)
+        await self._post_add_identity_embed(channel)
+        await self._post_edit_identity_embed(channel)
+        await self._post_remove_identity_embed(channel)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def startraid(self, ctx):
         """
-        Starts a new raid
+        Starts a new raid (admin only)
 
         DEVELOPER INFO:
         :param ctx: The context of invocation for the command that sheet was ran on.
         """
-        # remove colons because it screws up some sheets calls, heh
         bot = get_jorach()
-        finished = False
         user = ctx.message.author
         try:
-            while not finished:
-                raid_name = await prompt_freeform("What do you want to name the raid?\n" + \
-                "(One word, alphanumeric only, e.g. `ony` or `bwl`)", user)
-                raid_month = MONTHS.index(await prompt_choices("What month do you want to host the raid?", user, MONTHS)) + 1
-                raid_date = await prompt_freeform("What date do you want to hold the raid (e.g. 1 through 31)", user)
-                raid_time = await prompt_freeform("What time do you want to hold the raid? (Use military time, e.g. 18:30)", user)
-                raid_type = await prompt_choices("What type of raid is this?", user, list(RAID_TYPE_DRAWER_MAP.keys()))
-                raid_category = RAID_TYPE_DRAWER_MAP.get(raid_type, None)
-                if not raid_category:
-                    await user.send("Invalid raid type.")
-                    return
-                finished = True
-        except:
-            await user.send("Oops! Something went wrong. Please try again.")
+            raid_name = await prompt_freeform("What do you want to name the raid?\n" + \
+            "(One word, alphanumeric only, e.g. `ony` or `bwl`)", user)
+            raid_month = MONTHS.index(await prompt_choices("What month do you want to host the raid?", user, MONTHS)) + 1
+            raid_date = await prompt_freeform("What date do you want to hold the raid (e.g. 1 through 31)", user)
+            raid_time = await prompt_freeform("What time do you want to hold the raid? (Use military time, e.g. 18:30)", user)
+            raid_type = await prompt_choices("What type of raid is this?", user, list(RAID_TYPE_DRAWER_MAP.keys()))
+            raid_category = RAID_TYPE_DRAWER_MAP.get(raid_type, None)
+            role_mention = RAID_TYPE_MENTION_ROLE_MAP.get(raid_type, None)
+            if not raid_category or not role_mention:
+                raise Exception("Invalid raid type.")
+                return
+        except Exception as e:
+            await user.send("Oops! Something went wrong. {}".format(str(e)))
             return
 
+        # remove colons because it screws up some sheets calls, heh
         raid_title = "{} - {} {}/{} @ {}".format(raid_type, raid_name, raid_month, raid_date, raid_time).replace(":", "")
         safe_raid_name = raid_name.replace(" ", "-")
         channel_name = "{}-{}-{}".format(raid_month, raid_date, raid_name)
@@ -90,12 +90,19 @@ class Management(commands.Cog):
 
         msg = await channel.send(embed=embed)
         await msg.add_reaction(SIGNUP_EMOJI)
+        await channel.send("New raid signups are open! {}".format(role_mention))
         await user.send("Successfully created a raid in the {} category!".format(raid_category))
         return
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def deleteraid(self, ctx):
+        """
+        Deletes a raid when used in a raid signup channel (admin only)
+
+        DEVELOPER INFO:
+        :param ctx: The context of invocation for the command that sheet was ran on.
+        """
         channel = ctx.channel
         # Only delete channels in the raid categories
         if channel.category.name.lower() in [v.lower() for v in RAID_TYPE_DRAWER_MAP.values()]:
@@ -122,6 +129,7 @@ class Management(commands.Cog):
 
     async def _post_add_identity_embed(self, channel):
         embed = discord.Embed()
+        embed.color = discord.Color.green()
         embed.title = ADD_IDENTITY_EMBED_TITLE
         embed.description = ADD_IDENTITY_DESCRIPTION
 
@@ -130,6 +138,7 @@ class Management(commands.Cog):
 
     async def _post_edit_identity_embed(self, channel):
         embed = discord.Embed()
+        embed.color = discord.Color.gold()
         embed.title = EDIT_IDENTITY_EMBED_TITLE
         embed.description = EDIT_IDENTITY_DESCRIPTION
 
@@ -138,6 +147,7 @@ class Management(commands.Cog):
 
     async def _post_remove_identity_embed(self, channel):
         embed = discord.Embed()
+        embed.color = discord.Color.red()
         embed.title = REMOVE_IDENTITY_EMBED_TITLE
         embed.description = REMOVE_IDENTITY_DESCRIPTION
 
