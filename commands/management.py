@@ -2,56 +2,10 @@ import discord
 from discord.ext import commands
 
 from providers.jorach_bot import *
+from schema.constants import *
 from sheets.client import *
 
 
-SIGNUP_EMOJI = "☑"
-INTERACT_EMOJI = "📩"
-
-IDENTITY_EMBED_TITLE = "Getting Started with Your Identity"
-IDENTITY_REGISTRATION_DESCRIPTION = "In order to use this server, we require that you register a character identity.\n" \
-    + "Please click on the reaction below to add a character identity (you can also use this flow to add alts)."
-
-BASE_RAID_DESCRIPTION = \
-    ("React with %s to register for this raid! Raid times are in server time (PST/PDT)" % SIGNUP_EMOJI) \
-    + "\n\nNote that is is your responsibility to confirm that you have been signed up properly. If you run into an " \
-    + "issue while signing up, please contact a moderator."
-
-
-START_HERE_CATEGORY = "General"
-START_HERE_CHANNEL = "start-here"
-
-RAID_TYPE_PUG = "Pug"
-RAID_TYPE_RG1 = "RG1"
-RAID_TYPE_RG2 = "RG2"
-
-RG1_RAID_DRAWER_CATEGORY = "RG1 Raids"
-RG2_RAID_DRAWER_CATEGORY = "RG2 Raids"
-PUBLIC_RAID_DRAWER_CATEGORY = "Public Raids"
-
-RAID_TYPE_DRAWER_MAP = {
-    RAID_TYPE_PUG: PUBLIC_RAID_DRAWER_CATEGORY,
-    RAID_TYPE_RG1: RG1_RAID_DRAWER_CATEGORY,
-    RAID_TYPE_RG2: RG2_RAID_DRAWER_CATEGORY,
-}
-
-
-RAIDER_ROLE_NAME = "raider"
-
-MONTHS = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-]
 
 class Management(commands.Cog):
 
@@ -74,13 +28,9 @@ class Management(commands.Cog):
 
         channel = await category.create_text_channel(START_HERE_CHANNEL)
 
-        embed = discord.Embed()
-        embed.color = discord.Color.green()
-        embed.title = IDENTITY_EMBED_TITLE
-        embed.description = IDENTITY_REGISTRATION_DESCRIPTION
-
-        msg = await channel.send(embed=embed)
-        await msg.add_reaction(INTERACT_EMOJI)
+        self._post_add_identity_embed(channel)
+        self._post_edit_identity_embed(channel)
+        self._post_remove_identity_embed(channel)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -169,3 +119,27 @@ class Management(commands.Cog):
         if category == None:
             category = await guild.create_category(category_name)
         return category
+
+    async def _post_add_identity_embed(self, channel):
+        embed = discord.Embed()
+        embed.title = ADD_IDENTITY_EMBED_TITLE
+        embed.description = ADD_IDENTITY_DESCRIPTION
+
+        msg = await channel.send(embed=embed)
+        await msg.add_reaction(INTERACT_EMOJI)
+
+    async def _post_edit_identity_embed(self, channel):
+        embed = discord.Embed()
+        embed.title = EDIT_IDENTITY_EMBED_TITLE
+        embed.description = EDIT_IDENTITY_DESCRIPTION
+
+        msg = await channel.send(embed=embed)
+        await msg.add_reaction(INTERACT_EMOJI)
+
+    async def _post_remove_identity_embed(self, channel):
+        embed = discord.Embed()
+        embed.title = REMOVE_IDENTITY_EMBED_TITLE
+        embed.description = REMOVE_IDENTITY_DESCRIPTION
+
+        msg = await channel.send(embed=embed)
+        await msg.add_reaction(INTERACT_EMOJI)

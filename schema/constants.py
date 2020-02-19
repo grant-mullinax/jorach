@@ -1,0 +1,47 @@
+from datetime import datetime
+
+
+SIGNUP_EMOJI = "☑"
+INTERACT_EMOJI = "📩"
+
+
+ADD_IDENTITY_EMBED_TITLE = "Getting Started with Your Identity"
+ADD_IDENTITY_DESCRIPTION = "In order to use this server, we require that you register a character identity.\n" \
+    + "Please click on the reaction below to add a character identity (you can also use this flow to add alts)."
+
+
+EDIT_IDENTITY_EMBED_TITLE = "Edit an Existing Identity"
+EDIT_IDENTITY_DESCRIPTION = "Please click on the reaction below to edit an existing identity."
+
+
+REMOVE_IDENTITY_EMBED_TITLE = "Remove an Existing Identity"
+REMOVE_IDENTITY_DESCRIPTION = "Please click on the reaction below to remove an existing identity"
+
+
+BASE_RAID_DESCRIPTION = \
+    ("React with %s to register for this raid! Raid times are in server time (PST/PDT)" % SIGNUP_EMOJI) \
+    + "\n\nNote that is is your responsibility to confirm that you have been signed up properly. If you run into an " \
+    + "issue while signing up, please contact a moderator."
+
+
+START_HERE_CATEGORY = "General"
+START_HERE_CHANNEL = "start-here"
+
+
+RAID_TYPE_PUG = "Pug"
+RAID_TYPE_RG1 = "RG1"
+RAID_TYPE_RG2 = "RG2"
+
+
+RG1_RAID_DRAWER_CATEGORY = "RG1 Raids"
+RG2_RAID_DRAWER_CATEGORY = "RG2 Raids"
+PUBLIC_RAID_DRAWER_CATEGORY = "Public Raids"
+RAIDER_ROLE_NAME = "raider"
+RAID_TYPE_DRAWER_MAP = {
+    RAID_TYPE_PUG: PUBLIC_RAID_DRAWER_CATEGORY,
+    RAID_TYPE_RG1: RG1_RAID_DRAWER_CATEGORY,
+    RAID_TYPE_RG2: RG2_RAID_DRAWER_CATEGORY,
+}
+
+
+MONTHS = [datetime.strftime(datetime.strptime(str(x), "%m"), "%B") for x in range(1,13)]

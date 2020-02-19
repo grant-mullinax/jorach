@@ -35,6 +35,8 @@ async def prompt_choices(msg_header: str, user: User, choices: list):
     a choice by giving the index of the selection (starting from 1)
 
     """
+    if len(choices) == 1:
+        return choices[0]
     msg = msg_header + "\nPlease select a choice by replying with the number of your selection."
     i = 1
     for choice in choices:
@@ -57,9 +59,6 @@ async def prompt_choices(msg_header: str, user: User, choices: list):
         except:
             await user.send("Invalid selection. Please specify a valid number.")
     return selection
-
-
-
 
 
 def check_message_from_user(user):
