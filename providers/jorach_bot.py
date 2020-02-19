@@ -1,14 +1,13 @@
 from discord import User
 from discord.ext import commands
-
+from schema.constants import *
 
 __bot_description = """My name is Jorach Ravenholdt and I'm here to help YOU raid.
-Get started by using the !addidentity command.
-!addidentity <name> <wow_class> <role>
+Get started by looking in the #{} channel!
 
-look at my insides at
+Look at my insides at
 https://github.com/grant-mullinax/jorach
-"""
+""".format(START_HERE_CHANNEL)
 __bot = commands.Bot(command_prefix="!", description=__bot_description, case_insensitive=True)
 
 
