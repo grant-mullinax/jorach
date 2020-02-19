@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from discord.ext import commands
 
@@ -19,8 +19,9 @@ class Info(commands.Cog):
         :param ctx: The context of invocation
         :param params: No parameters are used.
         """
-        seed_date = datetime.strptime("1/5/20", "%m/%d/%y")
-        today = datetime.combine(date.today(), datetime.min.time())
+        tz = timezone(timedelta(hours=-7))
+        seed_date = datetime.strptime("1/5/20", "%m/%d/%y").astimezone(tz)
+        today = datetime.combine(date.today(), datetime.min.time()).astimezone(tz)
         days_until_ony = 5 - (today - seed_date).days % 5
         onyxia_time = today + timedelta(days=days_until_ony)
         await ctx.send("The next Onyxia reset is on {}".format(onyxia_time.strftime("%A %b %d")))
