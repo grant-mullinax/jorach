@@ -26,18 +26,6 @@ class Info(commands.Cog):
         await ctx.send("The next Onyxia reset is on {}".format(onyxia_time.strftime("%A %b %d")))
 
     @commands.command()
-    async def roles(self, ctx):
-        """
-        Shows what roles are available.
-
-        DEVELOPER INFO:
-        :param ctx: The context of invocation for the command that sheet was ran on.
-        :param params: No parameters are used.
-        """
-        await ctx.send("Valid roles are: %s" % ", ".join(get_all_roles()))
-        return
-
-    @commands.command()
     async def raids(self, ctx):
         """
         Shows what raids are available.

@@ -86,7 +86,7 @@ class Management(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def startraid(self, ctx):
         """
-        Starts a new raid with a given name on a given date.
+        Starts a new raid
 
         DEVELOPER INFO:
         :param ctx: The context of invocation for the command that sheet was ran on.
