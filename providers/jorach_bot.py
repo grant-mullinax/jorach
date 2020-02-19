@@ -36,7 +36,9 @@ async def prompt_choices(msg_header: str, user: User, choices: list):
 
     """
     if len(choices) == 1:
-        return choices[0]
+        selection = choices[0]
+        user.send("Only 1 choice. Selecting {}".format(selection))
+        return selection
     msg = msg_header + "\nPlease select a choice by replying with the number of your selection."
     i = 1
     for choice in choices:
