@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 
+from pytz import timezone
 from discord.ext import commands
 
 from schema.roles import get_all_roles
@@ -19,14 +20,21 @@ class Info(commands.Cog):
         :param ctx: The context of invocation
         :param params: No parameters are used.
         """
-        seed_date = datetime.strptime("1/5/20", "%m/%d/%y")
-        today = datetime.combine(date.today(), datetime.min.time())
-        days_until_ony = 5 - (today - seed_date).days % 5
-        onyxia_time = today + timedelta(days=days_until_ony)
-        prev_ony = onyxia_time + timedelta(days=-5)
-        await ctx.send("The next Onyxia reset is on {}\nThe previous reset was on {}".format(
-            onyxia_time.strftime("%A %b %d"),
-            prev_ony.strftime("%A %b %d"),
+        # 2020-02-09 8AM PST is a sample Onyxia reset time.
+        seed_time = "2020-02-09 08:00:00"
+        seed_date = datetime.strptime(seed_time, "%Y-%m-%d %H:%M:%S")
+
+        # localize helps us deal with DST. Not sure if I actually need to account for this.
+        seed_date = timezone("US/Pacific").localize(seed_date)
+        today = timezone("US/Pacific").localize(datetime.now())
+        onys_since = (today-seed_date).days // 5
+        ony_time = seed_date + timedelta(days=5*onys_since+5)
+        time_until = ony_time-today
+        await ctx.send("The next Onyxia reset is in `{}d{}h{}m` on `{}`".format(
+            time_until.days,
+            time_until.seconds // 3600,
+            (time_until.seconds % 3600) // 60,
+            ony_time.strftime("%A %b %d"),
         ))
 
     @commands.command()
