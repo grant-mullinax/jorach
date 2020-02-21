@@ -27,7 +27,7 @@ class Info(commands.Cog):
         # localize helps us deal with DST. Not sure if I actually need to account for this.
         tz = timezone("US/Pacific")
         seed_date = tz.localize(seed_date)
-        today = datetime.now(tz=tz)
+        today = datetime.now().astimezone(tz)
         onys_since = (today-seed_date).days // 5
         ony_time = seed_date + timedelta(days=5*onys_since+5)
         time_until = ony_time-today
