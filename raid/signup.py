@@ -15,8 +15,8 @@ def is_bot_raid_signup_msg(bot, msg, channel, user):
     return (msg.author.id == bot.user.id
             and user.id != bot.user.id
             and len(msg.embeds) > 0
-            and channel.category.name.lower() in [v.lower() for v in RAID_TYPE_DRAWER_MAP.values()]
-            and (any([msg.embeds[0].title.startswith(k) for k in list(RAID_TYPE_DRAWER_MAP.keys())]) or msg.embeds[0].title.startswith("Raid"))
+            and channel.category.name.lower() in [v.lower() for v in RAID_GROUP_DRAWER_MAP.values()]
+            and (any([msg.embeds[0].title.startswith(k) for k in list(RAID_GROUP_DRAWER_MAP.keys())]) or msg.embeds[0].title.startswith('Raid'))
     )
 
 
@@ -32,8 +32,8 @@ async def raid_signup(bot, channel, msg, user, guild, member, payload):
     raid_worksheet = get_worksheet(embed.title)
     user_profile_rows = get_rows_with_value_in_column(identity_worksheet, 1, author_hash)
     if not user_profile_rows:
-        raise Exception("You need to register a character before you can sign " \
-            + "up for raids! See the {} channel for info".format(START_HERE_CHANNEL))
+        raise Exception('You need to register a character before you can sign ' \
+            + 'up for raids! See the {} channel for info'.format(IDENTITY_MANAGEMENT_CHANNEL))
 
     chosen_row = None
     try:
@@ -45,11 +45,11 @@ async def raid_signup(bot, channel, msg, user, guild, member, payload):
             k = row_values(identity_worksheet, row)[2].lower()
             identity_to_row_map[k] = row
             user_identities.append(k)
-        user_choice = await prompt_choices("Which character would you like to sign up with?", user, user_identities)
+        user_choice = await prompt_choices('Which character would you like to sign up with?', user, user_identities)
         chosen_row = identity_to_row_map[user_choice]
     except Exception as e:
         print(e)
-        await user.send("Oops! Something went wrong. {}".format(str(e)))
+        await user.send('Oops! Something went wrong. {}'.format(str(e)))
         return
 
     identity_values = row_values(identity_worksheet, chosen_row)
@@ -58,7 +58,7 @@ async def raid_signup(bot, channel, msg, user, guild, member, payload):
 
     insert_row(raid_worksheet, [name, wow_class, role, str(datetime.now()), discord_id], len(names) + 1)
 
-    await user.send("Thank you! Your attendance has been recorded successfully.")
+    await user.send('Thank you! Your attendance has been recorded successfully.')
     await update_embed(msg)
 
 
@@ -89,14 +89,14 @@ async def update_embed(msg: discord.Message):
     raid_worksheet = get_worksheet(embed.title)
     roles = col_values(raid_worksheet, 3)
     for role in roles:
-        if role == "dps":
+        if role == 'dps':
             dps += 1
-        elif role == "healer":
+        elif role == 'healer':
             healer += 1
-        elif role == "tank":
+        elif role == 'tank':
             tank += 1
-    embed.set_field_at(0, name="DPS", value=dps)
-    embed.set_field_at(1, name="Healers", value=healer)
-    embed.set_field_at(2, name="Tanks", value=tank)
+    embed.set_field_at(0, name='DPS', value=dps)
+    embed.set_field_at(1, name='Healers', value=healer)
+    embed.set_field_at(2, name='Tanks', value=tank)
     embed.description = BASE_RAID_DESCRIPTION
     await msg.edit(embed=embed)

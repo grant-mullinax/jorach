@@ -2,12 +2,14 @@ from discord import User
 from discord.ext import commands
 from schema.constants import *
 
+OTHER = 'Other'
+TIMEOUT_ERR = "Operation timed out."
 __bot_description = """My name is Jorach Ravenholdt and I'm here to help YOU raid.
 Get started by looking in the #{} channel!
 
 Look at my insides at
 https://github.com/grant-mullinax/jorach
-""".format(START_HERE_CHANNEL)
+""".format(IDENTITY_MANAGEMENT_CHANNEL)
 __bot = commands.Bot(command_prefix="!", description=__bot_description, case_insensitive=True)
 
 
@@ -23,8 +25,8 @@ async def prompt_freeform(msg: str, user: User) -> str:
     user_msg = await __bot.wait_for("message", check=check_message_from_user(user), timeout=60)
     content = user_msg.content.lower().strip()
     if not content:
-        await user.send("Operation timed out.")
-        raise Exception("Operation timed out.")
+        await user.send(TIMEOUT_ERR)
+        raise Exception(TIMEOUT_ERR)
     return content
 
 
@@ -52,8 +54,8 @@ async def prompt_choices(msg_header: str, user: User, choices: list):
         user_msg = await __bot.wait_for("message", check=check_message_from_user(user), timeout=60)
         content = user_msg.content.strip()
         if not content:
-            await user.send("Operation timed out.")
-            raise Exception("Operation timed out.")
+            await user.send(TIMEOUT_ERR)
+            raise Exception(TIMEOUT_ERR)
         try:
             idx = int(content)
             if not idx in range(1, len(choices)+1):
@@ -62,6 +64,15 @@ async def prompt_choices(msg_header: str, user: User, choices: list):
         except:
             await user.send("Invalid selection. Please specify a valid number.")
     return selection
+
+
+async def prompt_choices_other(msg_header: str, other_header: str, user: User, choices: list):
+    choices_copy = choices.copy()
+    choices_copy.append(OTHER)
+    choice = await prompt_choices(msg_header, user, choices_copy)
+    if choice == OTHER:
+        choice = await prompt_freeform(other_header, user)
+    return choice
 
 
 def check_message_from_user(user):

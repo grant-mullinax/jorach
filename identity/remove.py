@@ -15,6 +15,7 @@ def is_bot_remove_identity_msg(bot, msg, channel, user):
             and msg.embeds[0].title == REMOVE_IDENTITY_EMBED_TITLE
     )
 
+
 async def remove_identity(bot, channel, msg, user, guild, member, payload):
     identity_worksheet = get_identity_worksheet()
     member_id = str(member.id)

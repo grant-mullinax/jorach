@@ -25,23 +25,24 @@ async def add_identity(bot, channel, msg, user, guild, member, payload):
 
     # Gather and validate user info.
     try:
-        name = await prompt_freeform("What is your character name?", user)
+        name = await prompt_freeform('What is your character name?', user).title()
+        # Raise if a duplicate name is found
         _find_duplicate_name(member_id, name)
-        wow_class = await prompt_choices("What is your class?", user, get_all_classes())
-        wow_role = await prompt_choices("What is your role?", user, get_class_roles(wow_class))
+        wow_class = await prompt_choices('What is your class?', user, get_all_classes())
+        wow_role = await prompt_choices('What is your role?', user, get_class_roles(wow_class))
     except Exception as e:
-        user.send("Oops, something went wrong: {}".format(str(e)))
+        user.send('Oops, something went wrong: {}'.format(str(e)))
         return
 
-    # Attempt to attach both a class role and the "Raider" role by default.
-    # The "Ravenguard" role MUST be added by an admin manually because we have no way of
+    # Attempt to attach both a class role and the 'Raider' role by default.
+    # The 'Ravenguard' role MUST be added by an admin manually because we have no way of
     # programmatically verifying it.
     await _add_roles(wow_class, guild, member)
     await _add_nick(member, name)
 
     # User does not have a character with the same name; class and role valid. Can register a new profile
     append_row(identity_worksheet, [member_id, str(user), name.lower(), wow_class.lower(), wow_role.lower()])
-    await user.send("\"%s\" registered successfully." % name)
+    await user.send('{} registered successfully.'.format(name))
 
 
 async def _add_roles(wow_class, guild, member):
@@ -71,7 +72,7 @@ async def _add_nick(member, nickname):
         except:
             # This can fail if the member is too high up on the hierarchy (the bot can't change the nickname
             # of a server owner). Just let it slide for now.
-            print("Could not change nickname for {}".format(member.name))
+            print('Could not change nickname for {}'.format(member.name))
 
 
 def _find_duplicate_name(member_id: str, name: str):
@@ -91,4 +92,4 @@ def _find_duplicate_name(member_id: str, name: str):
 
         if rows_with_name_for_user_with_id:
             # Uh oh.. the user already registered a character with the same name! Tell them they STUPID.
-            raise Exception("Unable to add profile: You already have a character named `{}`".format(name))
+            raise Exception('Unable to add profile: You already have a character named `{}`'.format(name))

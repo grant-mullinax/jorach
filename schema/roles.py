@@ -2,9 +2,9 @@ from enum import Enum
 
 
 class Role(Enum):
-    dps = "dps"
-    healer = "healer"
-    tank = "tank"
+    dps = 'dps'
+    healer = 'healer'
+    tank = 'tank'
 
 
 def get_all_roles():

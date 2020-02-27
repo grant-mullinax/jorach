@@ -11,6 +11,7 @@ def is_bot_edit_identity_msg(bot, msg, channel, user):
     """
     return (msg.author.id == bot.user.id
             and user.id != bot.user.id
+            and channel.name == IDENTITY_MANAGEMENT_CHANNEL
             and channel.category.name == START_HERE_CATEGORY
             and len(msg.embeds) > 0
             and msg.embeds[0].title == EDIT_IDENTITY_EMBED_TITLE

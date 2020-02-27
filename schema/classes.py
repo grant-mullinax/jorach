@@ -3,28 +3,28 @@ from schema.roles import Role
 
 
 CLASS_ROLE_MAP = {
-    "druid": [Role.dps.value, Role.healer.value, Role.tank.value],
-    "hunter": [Role.dps.value],
-    "mage": [Role.dps.value],
-    "paladin": [Role.dps.value, Role.healer.value, Role.tank.value],
-    "priest": [Role.dps.value, Role.healer.value],
-    "rogue": [Role.dps.value],
-    "shaman": [Role.dps.value, Role.healer.value],
-    "warlock": [Role.dps.value],
-    "warrior": [Role.dps.value, Role.tank.value],
+    'Druid': [Role.dps.value, Role.healer.value, Role.tank.value],
+    'Hunter': [Role.dps.value],
+    'Mage': [Role.dps.value],
+    'Paladin': [Role.dps.value, Role.healer.value, Role.tank.value],
+    'Priest': [Role.dps.value, Role.healer.value],
+    'Rogue': [Role.dps.value],
+    'Shaman': [Role.dps.value, Role.healer.value],
+    'Warlock': [Role.dps.value],
+    'Warrior': [Role.dps.value, Role.tank.value],
 }
 
 
 class WowClass(Enum):
-    druid = "druid"
-    hunter = "hunter"
-    mage = "mage"
-    paladin = "paladin"
-    priest = "priest"
-    rogue = "rogue"
-    shaman = "shaman"
-    warlock = "warlock"
-    warrior = "warrior"
+    druid = 'Druid'
+    hunter = 'Hunter'
+    mage = 'Mage'
+    paladin = 'Paladin'
+    priest = 'Priest'
+    rogue = 'Rogue'
+    shaman = 'Shaman'
+    warlock = 'Warlock'
+    warrior = 'Warrior'
 
 
 def get_all_classes():
