@@ -19,7 +19,7 @@ EDIT_IDENTITY_DESCRIPTION = 'Please click on the {} below to edit an existing id
 
 
 REMOVE_IDENTITY_EMBED_TITLE = 'Remove an Existing Identity'
-REMOVE_IDENTITY_DESCRIPTION = 'Please click on the {} below to remove an existing identity.\n' \
+REMOVE_IDENTITY_DESCRIPTION = 'Please click on the {} below to remove an existing identity.\n'.format(INTERACT_EMOJI) \
     + 'You must have an existing identity for this to work.'
 
 
