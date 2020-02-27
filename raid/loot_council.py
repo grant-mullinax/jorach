@@ -24,6 +24,7 @@ async def _loot_council_start(user, guild, raid_type):
     await _channel_move_helper(
         user,
         guild,
+        RAID_GROUP_DRAWER_MAP.get(raid_type, None),
         RAID_GROUP_CHANNEL_MAP.get(raid_type, None),
         RAID_GROUP_LC_CHANNEL_MAP.get(raid_type, None),
     )
@@ -33,6 +34,7 @@ async def _loot_council_end(user, guild, raid_type):
     await _channel_move_helper(
         user,
         guild,
+        RAID_GROUP_DRAWER_MAP.get(raid_type, None),
         RAID_GROUP_LC_CHANNEL_MAP.get(raid_type, None),
         RAID_GROUP_CHANNEL_MAP.get(raid_type, None),
     )
@@ -43,12 +45,12 @@ def _get_raid_type_from_embed(msg):
     return tokens[0].upper()
 
 
-async def _channel_move_helper(user, guild, src_channel_name, dest_channel_name):
-    if not src_channel_name or not dest_channel_name:
+async def _channel_move_helper(user, guild, raid_drawer_name, src_channel_name, dest_channel_name):
+    if not src_channel_name or not dest_channel_name or not raid_drawer_name:
         await user.send('Invalid raid type, please specify any of {}'.format(
             str(list(RAID_GROUP_CHANNEL_MAP.keys())).replace('\'', '')))
         return
-    category = find_by_name(guild.categories, 'voice channels')
+    category = find_by_name(guild.categories, raid_drawer_name)
     if not category:
         await user.send('Could not find the loot council voice channel')
         return
