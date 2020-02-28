@@ -49,18 +49,23 @@ async def _add_roles(wow_class, guild, member):
     """
     raider_role = None
     class_role = None
+    ravenguard_role = None
     for role in guild.roles:
         if str(role).lower() == RAIDER_ROLE_NAME:
             raider_role = role
         elif str(role).lower() == wow_class.lower():
             class_role = role
-        if class_role and raider_role:
+        elif str(role).lower() == RAVENGUARD_ROLE_NAME:
+            ravenguard_role = role
+        if class_role and raider_role and ravenguard_role:
             break
     if not raider_role:
         raider_role = await guild.create_role(name=RAIDER_ROLE_NAME)
     if not class_role:
         class_role = await guild.create_role(name=wow_class)
-    await member.add_roles(raider_role, class_role)
+    await member.add_roles(class_role)
+    if not ravenguard_role:
+        await member.add_roles(raider_role)
 
 
 async def _add_nick(member, nickname):
