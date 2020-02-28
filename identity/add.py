@@ -1,48 +1,46 @@
+from menus.embed import EmbedMenu
 from providers.jorach_bot import prompt_choices, prompt_freeform
 from schema.classes import get_all_classes, get_class_roles
 from schema.constants import *
 from sheets.client import *
 
 
-def is_bot_add_identity_msg(bot, msg, channel, user):
-    """
-    Returns true if the given message was posted by the bot,
-    the user reacting is NOT the bot, AND the message embed title is the add identity title
-    """
-    return (msg.author.id == bot.user.id
-            and user.id != bot.user.id
-            and channel.category.name == START_HERE_CATEGORY
-            and len(msg.embeds) > 0
+class AddIdentityMenu(EmbedMenu):
+    async def check_message(self, channel, msg, user) -> bool:
+        """
+        Returns true if the message embed title is the add identity title
+        """
+        return channel.category.name == START_HERE_CATEGORY \
             and msg.embeds[0].title == ADD_IDENTITY_EMBED_TITLE
-    )
 
+    async def handle_emoji(self, emoji, channel, msg, user, guild, member):
+        """
+        Set up a user identity from info parsed out of a reaction to a message
+        """
+        await msg.remove_reaction(emoji, user)
+        member_id = str(member.id)
 
-async def add_identity(bot, channel, msg, user, guild, member, payload):
-    """
-    Set up a user identity from info parsed out of a reaction to a message
-    """
-    member_id = str(member.id)
+        # Gather and validate user info.
+        try:
+            name = await prompt_freeform('What is your character name?', user)
+            name = name.title()
+            # Raise if a duplicate name is found
+            _find_duplicate_name(member_id, name)
+            wow_class = await prompt_choices('What is your class?', user, get_all_classes())
+            wow_role = await prompt_choices('What is your role?', user, get_class_roles(wow_class))
+        except Exception as e:
+            await user.send('Oops, something went wrong: {}'.format(str(e)))
+            return
 
-    # Gather and validate user info.
-    try:
-        name = await prompt_freeform('What is your character name?', user).title()
-        # Raise if a duplicate name is found
-        _find_duplicate_name(member_id, name)
-        wow_class = await prompt_choices('What is your class?', user, get_all_classes())
-        wow_role = await prompt_choices('What is your role?', user, get_class_roles(wow_class))
-    except Exception as e:
-        user.send('Oops, something went wrong: {}'.format(str(e)))
-        return
+        # Attempt to attach both a class role and the 'Raider' role by default.
+        # The 'Ravenguard' role MUST be added by an admin manually because we have no way of
+        # programmatically verifying it.
+        await _add_roles(wow_class, guild, member)
+        await _add_nick(member, name)
 
-    # Attempt to attach both a class role and the 'Raider' role by default.
-    # The 'Ravenguard' role MUST be added by an admin manually because we have no way of
-    # programmatically verifying it.
-    await _add_roles(wow_class, guild, member)
-    await _add_nick(member, name)
-
-    # User does not have a character with the same name; class and role valid. Can register a new profile
-    append_row(identity_worksheet, [member_id, str(user), name.lower(), wow_class.lower(), wow_role.lower()])
-    await user.send('{} registered successfully.'.format(name))
+        # User does not have a character with the same name; class and role valid. Can register a new profile
+        append_row(identity_worksheet, [member_id, str(user), name.lower(), wow_class.lower(), wow_role.lower()])
+        await user.send('{} registered successfully.'.format(name))
 
 
 async def _add_roles(wow_class, guild, member):

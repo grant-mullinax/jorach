@@ -42,9 +42,6 @@ async def prompt_choices(msg_header: str, user: User, choices: list):
     msg = msg_header + "\nPlease select a choice by replying with the number of your selection."
     i = 1
     for choice in choices:
-        # Make it pretty if we're using strings.
-        if type(choice) == str:
-            choice = choice.title()
         part = "\n{}. {}".format(i, choice)
         msg += part
         i += 1

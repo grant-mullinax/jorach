@@ -1,15 +1,25 @@
+from menus.embed import EmbedMenu
+from raid.util import is_raid_category
 from schema.constants import *
 from schema.util import find_by_name
 
-def is_loot_council_control_msg(bot, msg, channel, user):
-    return (msg.author.id == bot.user.id
-        and user.id != bot.user.id
-        and len(msg.embeds) > 0
-        and channel.category.name.lower() in [v.lower() for v in RAID_GROUP_DRAWER_MAP.values()]
-        and (any([msg.embeds[0].title == '{} {}'.format(k, LOOT_COUNCIL_EMBED_TITLE)
-            for k in list(RAID_GROUP_DRAWER_MAP.keys())]))
-    )
 
+class LootCouncilMenu(EmbedMenu):
+    async def check_message(self, channel, msg, user) -> bool:
+        return is_raid_category(channel) and _is_loot_council_embed_title(msg.embeds[0])
+
+    async def handle_emoji(self, emoji, channel, msg, user, guild, member):
+        await msg.remove_reaction(emoji, user)
+        k = _get_raid_type_from_embed(msg)
+        str_emoji = str(emoji)
+        if str_emoji == LOOT_COUNCIL_START_EMOJI:
+            return await _loot_council_start(user, guild, k)
+        elif str_emoji == LOOT_COUNCIL_STOP_EMOJI:
+            return await _loot_council_end(user, guild, k)
+
+def _is_loot_council_embed_title(embed):
+    return any([embed.title == '{} {}'.format(k, LOOT_COUNCIL_EMBED_TITLE)
+                for k in list(RAID_GROUP_DRAWER_MAP.keys())])
 
 async def process_loot_council_control(bot, channel, msg, user, guild, member, payload):
     k = _get_raid_type_from_embed(msg)

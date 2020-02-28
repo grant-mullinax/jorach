@@ -1,27 +1,24 @@
+from menus.embed import EmbedMenu
 from providers.jorach_bot import prompt_choices, prompt_freeform
 from schema.classes import get_all_classes, get_class_roles
 from schema.constants import *
 from sheets.client import *
 
-
-def is_bot_edit_identity_msg(bot, msg, channel, user):
-    """
-    Returns true if the given message was posted by the bot,
-    the user reacting is NOT the bot, AND the message embed title is the add identity title
-    """
-    return (msg.author.id == bot.user.id
-            and user.id != bot.user.id
-            and channel.name == IDENTITY_MANAGEMENT_CHANNEL
+class EditIdentityMenu(EmbedMenu):
+    async def check_message(self, channel, msg, user) -> bool:
+        """
+        Returns true if the message embed title is the add identity title
+        """
+        return (channel.name == IDENTITY_MANAGEMENT_CHANNEL
             and channel.category.name == START_HERE_CATEGORY
-            and len(msg.embeds) > 0
             and msg.embeds[0].title == EDIT_IDENTITY_EMBED_TITLE
-    )
+        )
 
-
-async def edit_identity(bot, channel, msg, user, guild, member, payload):
+    async def handle_emoji(self, emoji, channel, msg, user, guild, member):
         """
         Edits your identity as set up with the bot.
         """
+        await msg.remove_reaction(emoji, user)
         identity_worksheet = get_identity_worksheet()
         member_id = str(member.id)
 
