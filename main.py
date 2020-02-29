@@ -58,7 +58,6 @@ async def on_raw_reaction_remove(payload):
         await handle_error(*args, e)
 
 
-
 @bot.event
 async def on_raw_reaction_add(payload):
     args = await parse_objs_from_payload(payload)
@@ -70,9 +69,9 @@ async def on_raw_reaction_add(payload):
 
 
 async def handle_error(emoji, channel, msg, user, guild, member, e):
-        print('Error for user {} interacting with {}\nException: {}'.format(
-            user.name, msg.embeds[0].title, str(e)))
-        await user.send('Oops! Something went wrong {}'.format(str(e)))
+    print('Error for user {} interacting with {}\nException: {}'.format(
+        user.name, msg.embeds[0].title, str(e)))
+    await user.send('Oops! Something went wrong {}'.format(str(e)))
 
 
 async def parse_objs_from_payload(payload):

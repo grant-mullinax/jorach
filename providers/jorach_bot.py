@@ -10,7 +10,8 @@ Get started by looking in the #{} channel!
 Look at my insides at
 https://github.com/grant-mullinax/jorach
 """.format(IDENTITY_MANAGEMENT_CHANNEL)
-__bot = commands.Bot(command_prefix="!", description=__bot_description, case_insensitive=True)
+__bot = commands.Bot(command_prefix="!",
+                     description=__bot_description, case_insensitive=True)
 
 
 def get_jorach():
@@ -56,7 +57,8 @@ async def prompt_choices(msg_header: str, user: User, choices: list):
         try:
             idx = int(content)
             if not idx in range(1, len(choices)+1):
-                raise ValueError("Index out of range: {}. Must be between 1 and {}".format(idx, len(choices)))
+                raise ValueError(
+                    "Index out of range: {}. Must be between 1 and {}".format(idx, len(choices)))
             selection = choices[idx-1]
         except:
             await user.send("Invalid selection. Please specify a valid number.")

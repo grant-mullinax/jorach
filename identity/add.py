@@ -39,7 +39,8 @@ class AddIdentityMenu(EmbedMenu):
         await _add_nick(member, name)
 
         # User does not have a character with the same name; class and role valid. Can register a new profile
-        append_row(identity_worksheet, [member_id, str(user), name.lower(), wow_class.lower(), wow_role.lower()])
+        append_row(identity_worksheet, [member_id, str(
+            user), name.lower(), wow_class.lower(), wow_role.lower()])
         await user.send('{} registered successfully.'.format(name))
 
 
@@ -86,13 +87,14 @@ def _find_duplicate_name(member_id: str, name: str):
     identity_worksheet = get_identity_worksheet()
 
     rows_for_user_with_id = get_rows_with_value_in_column(identity_worksheet, column_index=1,
-         value_to_find=member_id)
+                                                          value_to_find=member_id)
 
     if rows_for_user_with_id:
         # The user has other profiles; make sure they don't duplicate an entry with the same character name
         rows_with_name_for_user_with_id = get_rows_with_value_in_column(identity_worksheet,
-            column_index=3, value_to_find=name.lower(), list_search_rows=rows_for_user_with_id)
+                                                                        column_index=3, value_to_find=name.lower(), list_search_rows=rows_for_user_with_id)
 
         if rows_with_name_for_user_with_id:
             # Uh oh.. the user already registered a character with the same name! Tell them they STUPID.
-            raise Exception('Unable to add profile: You already have a character named `{}`'.format(name))
+            raise Exception(
+                'Unable to add profile: You already have a character named `{}`'.format(name))

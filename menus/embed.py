@@ -15,10 +15,10 @@ class EmbedMenu(ABC):
 
     async def execute(self, bot, emoji, channel, msg, user, guild, member):
         if self._is_human_reacting_to_bot_embed(bot, msg, user) \
-            and await self.check_message(channel, msg, user):
+                and await self.check_message(channel, msg, user):
             await self.handle_emoji(emoji, channel, msg, user, guild, member)
 
     def _is_human_reacting_to_bot_embed(self, bot, msg, user):
         return (msg.author.id == bot.user.id
-            and user.id != bot.user.id
-            and len(msg.embeds) > 0)
+                and user.id != bot.user.id
+                and len(msg.embeds) > 0)

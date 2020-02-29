@@ -12,7 +12,7 @@ from sheets.client import *
 
 RAID_OTHER_PROMPT = 'What would you like to call the raid? ' \
     + 'Use alphanumeric characters and hyphens only [A-Za-z0-9] ' \
-    +'e.g. `onypickup2`, `aq40-group1`.'
+    + 'e.g. `onypickup2`, `aq40-group1`.'
 
 
 class Management(commands.Cog):
@@ -90,8 +90,10 @@ class Management(commands.Cog):
         category_name = RAID_GROUP_DRAWER_MAP.get(raid_group, None)
         if category_name:
             category = await create_category_if_not_exists(guild, category_name)
-            channel_name = '{}-{}'.format(raid_group, RAID_CONTROLS_CHANNEL_SUFFIX)
-            existing_channel = find_by_name(category.text_channels, channel_name.lower())
+            channel_name = '{}-{}'.format(raid_group,
+                                          RAID_CONTROLS_CHANNEL_SUFFIX)
+            existing_channel = find_by_name(
+                category.text_channels, channel_name.lower())
             if not existing_channel:
                 channel = await create_text_channel_if_not_exists(category, channel_name)
                 await self._post_raid_control_embed(channel, raid_group)
@@ -127,7 +129,6 @@ class Management(commands.Cog):
         await self._post_add_identity_embed(channel)
         await self._post_edit_identity_embed(channel)
         await self._post_remove_identity_embed(channel)
-
 
     async def _setup_raid_voice_for_category(self, category):
         for channel_name in RAID_DRAWER_ALL_CHANNELS_MAP.get(category.name, []):

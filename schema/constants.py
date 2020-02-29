@@ -29,7 +29,8 @@ LOOT_COUNCIL_CONTROL_DESCRIPTION = 'Press {} to start a loot council session.\n'
 
 
 RAID_CONTROL_EMBED_TITLE = 'Raid Control Panel'
-RAID_CONTROL_EMBED_DESCRIPTION = 'Press {} to start a new raid.'.format(INTERACT_EMOJI)
+RAID_CONTROL_EMBED_DESCRIPTION = 'Press {} to start a new raid.'.format(
+    INTERACT_EMOJI)
 
 
 BASE_RAID_DESCRIPTION = \
@@ -102,4 +103,5 @@ RAID_DUNGEON_LIST = [
     # RAID_DUNGEON_NAXX, # PHASE 6
 ]
 
-MONTHS = [datetime.strftime(datetime.strptime(str(x), '%m'), '%B') for x in range(1,13)]
+MONTHS = [datetime.strftime(datetime.strptime(
+    str(x), '%m'), '%B') for x in range(1, 13)]

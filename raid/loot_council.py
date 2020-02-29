@@ -17,9 +17,11 @@ class LootCouncilMenu(EmbedMenu):
         elif str_emoji == LOOT_COUNCIL_STOP_EMOJI:
             return await _loot_council_end(user, guild, k)
 
+
 def _is_loot_council_embed_title(embed):
     return any([embed.title == '{} {}'.format(k, LOOT_COUNCIL_EMBED_TITLE)
                 for k in list(RAID_GROUP_DRAWER_MAP.keys())])
+
 
 async def process_loot_council_control(bot, channel, msg, user, guild, member, payload):
     k = _get_raid_type_from_embed(msg)

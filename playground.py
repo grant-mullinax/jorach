@@ -10,7 +10,8 @@ config.read_file(open('config.ini'))
 scope = ["https://spreadsheets.google.com/feeds",
          "https://www.googleapis.com/auth/drive"]
 
-credentials = ServiceAccountCredentials.from_json_keyfile_name(config["keys"]["GoogleCredentialsFile"], scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name(
+    config["keys"]["GoogleCredentialsFile"], scope)
 gc = gspread.authorize(credentials)
 spreadsheet = gc.open_by_key(config["default"]["SpreadsheetId"])
 identity_worksheet = spreadsheet.worksheet("identity")

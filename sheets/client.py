@@ -113,7 +113,8 @@ def get_rows_with_value_in_column(worksheet, column_index, value_to_find, list_s
 
     if list_search_rows:
         # Filter; search each individual valid row
-        valid_rows = [row for row in list_search_rows if row - 1 < len(cols_of_values)]
+        valid_rows = [row for row in list_search_rows if row -
+                      1 < len(cols_of_values)]
         return [row for row in valid_rows if cols_of_values[row - 1] == value_to_find]
     else:
         # No filter
@@ -128,7 +129,8 @@ __scope = ["https://spreadsheets.google.com/feeds",
 
 __config = configparser.ConfigParser()
 __config.read_file(open('config.ini'))
-__credentials = ServiceAccountCredentials.from_json_keyfile_name(__config["keys"]["GoogleCredentialsFile"], __scope)
+__credentials = ServiceAccountCredentials.from_json_keyfile_name(
+    __config["keys"]["GoogleCredentialsFile"], __scope)
 spreadsheet_id = __config["default"]["SpreadsheetId"]
 gc = gspread.authorize(__credentials, client_class=RetryClient)
 gc.login()

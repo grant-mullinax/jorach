@@ -25,10 +25,11 @@ class RaidSignupMenu(EmbedMenu):
 
         author_hash = str(user.id)
         raid_worksheet = get_worksheet(embed.title)
-        user_profile_rows = get_rows_with_value_in_column(identity_worksheet, 1, author_hash)
+        user_profile_rows = get_rows_with_value_in_column(
+            identity_worksheet, 1, author_hash)
         if not user_profile_rows:
-            raise Exception('You need to register a character before you can sign ' \
-                + 'up for raids! See the {} channel for info'.format(IDENTITY_MANAGEMENT_CHANNEL))
+            raise Exception('You need to register a character before you can sign '
+                            + 'up for raids! See the {} channel for info'.format(IDENTITY_MANAGEMENT_CHANNEL))
 
         chosen_row = None
         try:
@@ -51,7 +52,8 @@ class RaidSignupMenu(EmbedMenu):
         discord_id, name, wow_class, role = identity_values[1:5]
         names = col_values(raid_worksheet, 1)
 
-        insert_row(raid_worksheet, [name, wow_class, role, str(datetime.now()), discord_id], len(names) + 1)
+        insert_row(raid_worksheet, [name, wow_class, role, str(
+            datetime.now()), discord_id], len(names) + 1)
 
         await user.send('Thank you! Your attendance has been recorded successfully.')
         await _update_raid_embed(msg)
@@ -95,7 +97,8 @@ class RaidSignupEmbed:
 
 def _is_raid_signup_title(embed):
     return (any([embed.title.startswith(k) for k in list(RAID_GROUP_DRAWER_MAP.keys())])
-        or embed.title.startswith('Raid'))
+            or embed.title.startswith('Raid'))
+
 
 async def _update_raid_embed(msg: discord.Message):
     embed = msg.embeds[0]
