@@ -64,7 +64,7 @@ async def _add_roles(wow_class, guild, member):
     if not class_role:
         class_role = await guild.create_role(name=wow_class)
     await member.add_roles(class_role)
-    if not ravenguard_role:
+    if ravenguard_role not in member.roles:
         await member.add_roles(raider_role)
 
 
