@@ -26,12 +26,17 @@ class StartRaidMenu(EmbedMenu):
 
     async def handle_emoji(self, emoji, channel, msg, user, guild, member):
         await msg.remove_reaction(emoji, user)
-        raid_name = await prompt_choices_other('What type of raid would you like to start?',
+        raid_category = channel.category.name
+        raid_group = _get_raid_group(raid_category)
+
+        if raid_group == RAID_GROUP_ZG:
+            raid_name = await prompt_freeform('What is the name of your raid group?\n(e.g. `Megasharks`, `Besaid Barcas`, `Wangsly and the Jets`).\nPlease keep it short and use alphanum only so nothing breaks. Kthx', user)
+        else:
+            raid_name = await prompt_choices_other('What type of raid would you like to start?',
                                                _RAID_OTHER_PROMPT, member, RAID_DUNGEON_LIST)
         raid_month, raid_date, raid_day = await _get_raid_date(member)
         raid_time = await prompt_freeform('What time do you want to hold the raid? (Use military time, e.g. 18:30)', user)
-        raid_category = channel.category.name
-        raid_group = _get_raid_group(raid_category)
+
         role_mention = RAID_GROUP_MENTION_ROLE_MAP.get(raid_group, None)
         if not raid_category or not role_mention:
             raise Exception('Invalid raid group.')
@@ -53,8 +58,9 @@ class StartRaidMenu(EmbedMenu):
             await user.send('Already have a channel for this raid, cancelling.')
             return
         channel = await category.create_text_channel(channel_name)
-
-        msg = await channel.send(embed=RaidSignupEmbed(raid_title, get_worksheet_link(worksheet)).embed)
+        if raid_group == RAID_GROUP_ZG:
+            mention = user.mention
+        msg = await channel.send(embed=RaidSignupEmbed(raid_title, get_worksheet_link(worksheet), mention=mention).embed)
         await msg.add_reaction(SIGNUP_EMOJI)
         await channel.send('New raid signups are open! {}'.format(role_mention))
         await user.send('Successfully created a raid in the {} category!'.format(raid_category))

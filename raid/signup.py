@@ -80,7 +80,7 @@ class RaidDeregisterMenu(EmbedMenu):
 
 
 class RaidSignupEmbed:
-    def __init__(self, raid_title, worksheet_link):
+    def __init__(self, raid_title, worksheet_link, mention=None):
         self._embed = discord.Embed()
         self._embed.color = discord.Color.green()
         self._embed.title = raid_title
@@ -88,6 +88,8 @@ class RaidSignupEmbed:
         self._embed.add_field(name='DPS', value=0)
         self._embed.add_field(name='Healer', value=0)
         self._embed.add_field(name='Tank', value=0)
+        if mention:
+            self._embed.add_field(name='Host', value=mention)
         self._embed.url = worksheet_link
 
     @property
