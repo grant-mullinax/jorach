@@ -58,6 +58,7 @@ class StartRaidMenu(EmbedMenu):
             await user.send('Already have a channel for this raid, cancelling.')
             return
         channel = await category.create_text_channel(channel_name)
+        mention = None
         if raid_group == RAID_GROUP_ZG:
             mention = user.mention
         msg = await channel.send(embed=RaidSignupEmbed(raid_title, get_worksheet_link(worksheet), mention=mention).embed)
