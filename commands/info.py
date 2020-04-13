@@ -32,7 +32,7 @@ class Info(commands.Cog):
         :param ctx: The context of invocation
         :param params: No parameters are used.
         """
-        await self._raid_reset_timer(ctx, "Zul'Gurub", '2020-04-15 08:00:00', 3)
+        await self._raid_reset_timer(ctx, "Zul'Gurub", '2020-04-13 08:00:00', 3)
 
     @commands.command()
     async def sheet(self, ctx):
