@@ -39,7 +39,7 @@ BASE_RAID_DESCRIPTION = \
     + 'If you run into an issue while signing up, please contact a moderator.'
 
 
-START_HERE_CATEGORY = 'General'
+START_HERE_CATEGORY = 'Public'
 IDENTITY_MANAGEMENT_CHANNEL = 'identity-management'
 
 
