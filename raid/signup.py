@@ -23,10 +23,9 @@ class RaidSignupMenu(EmbedMenu):
             await msg.remove_reaction(emoji, user)
             return
 
-        author_hash = str(user.id)
         raid_worksheet = get_worksheet(embed.title)
         user_profile_rows = get_rows_with_value_in_column(
-            identity_worksheet, 1, author_hash)
+            identity_worksheet, 1, str(member.id))
         if not user_profile_rows:
             raise Exception('You need to register a character before you can sign '
                             + 'up for raids! See the {} channel for info'.format(IDENTITY_MANAGEMENT_CHANNEL))
@@ -49,11 +48,11 @@ class RaidSignupMenu(EmbedMenu):
             return
 
         identity_values = row_values(identity_worksheet, chosen_row)
-        discord_id, name, wow_class, role = identity_values[1:5]
+        user_id, _, name, wow_class, role = identity_values[0:5]
         names = col_values(raid_worksheet, 1)
 
         insert_row(raid_worksheet, [name, wow_class, role, str(
-            datetime.now()), discord_id], len(names) + 1)
+            datetime.now()), user_id], len(names) + 1)
 
         await user.send('Thank you! Your attendance has been recorded successfully.')
         await _update_raid_embed(msg)
@@ -70,12 +69,20 @@ class RaidDeregisterMenu(EmbedMenu):
         if str(emoji) == SIGNUP_EMOJI:
             embed = msg.embeds[0]
             raid_worksheet = get_worksheet(embed.title)
-            discord_ids = col_values(raid_worksheet, 5)
+            
+            user_ids = col_values(raid_worksheet, 5)
             try:
-                delete_row(raid_worksheet, discord_ids.index(str(user)) + 1)
+                # Try to delete by the member id
+                delete_row(raid_worksheet, user_ids.index(str(member.id)) + 1)
             except ValueError:
-                # Treat deletion of an ID that doesn't exist as idempotent success
-                pass
+                # TODO: Can remove this try/except block after the migration is complete.
+                try:
+                    # If member ID doesn't exist, it's because we're still migrating to the new schema.
+                    # Delete it by the user id.
+                    delete_row(raid_worksheet, user_ids.index(str(user)) + 1)
+                except ValueError:
+                    # Treat deletion of an ID that doesn't exist as idempotent success
+                    pass
             await _update_raid_embed(msg)
 
 
