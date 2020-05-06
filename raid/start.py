@@ -38,7 +38,7 @@ class StartRaidMenu(EmbedMenu):
         raid_time = await prompt_freeform('What time do you want to hold the raid? (Use military time, e.g. 18:30)', user)
 
         role_mention = RAID_GROUP_MENTION_ROLE_MAP.get(raid_group, None)
-        if not raid_category or not role_mention:
+        if not raid_category:
             raise Exception('Invalid raid group.')
 
         # remove colons because it screws up some sheets calls, heh
@@ -63,7 +63,8 @@ class StartRaidMenu(EmbedMenu):
             mention = user.mention
         msg = await channel.send(embed=RaidSignupEmbed(raid_title, get_worksheet_link(worksheet), mention=mention).embed)
         await msg.add_reaction(SIGNUP_EMOJI)
-        await channel.send('New raid signups are open! {}'.format(role_mention))
+        if role_mention:
+            await channel.send('New raid signups are open! {}'.format(role_mention))
         await user.send('Successfully created a raid in the {} category!'.format(raid_category))
 
 
