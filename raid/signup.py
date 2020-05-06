@@ -74,7 +74,6 @@ class RaidDeregisterMenu(EmbedMenu):
             try:
                 # Try to delete by the member id
                 delete_row(raid_worksheet, user_ids.index(str(member.id)) + 1)
-                # First try to delete by member id
             except ValueError:
                 # TODO: Can remove this try/except block after the migration is complete.
                 try:
