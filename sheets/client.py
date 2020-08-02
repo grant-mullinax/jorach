@@ -92,6 +92,10 @@ def update_cell(worksheet, row_index, col_index, value):
     return worksheet.update_cell(row_index, col_index, value)
 
 
+def get_all_values(worksheet):
+    return worksheet.get_all_values()
+
+
 def get_worksheet_link(worksheet):
     return "{}#gid={}".format(get_spreadsheet_link(), worksheet.id)
 

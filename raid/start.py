@@ -33,7 +33,7 @@ class StartRaidMenu(EmbedMenu):
             raid_name = await prompt_freeform('What is the name of your raid group?\n(e.g. `Megasharks`, `Besaid Barcas`, `Wangsly and the Jets`).\nPlease keep it short and use alphanum only so nothing breaks. Kthx', user)
         else:
             raid_name = await prompt_choices_other('What type of raid would you like to start?',
-                                               _RAID_OTHER_PROMPT, member, RAID_DUNGEON_LIST)
+                                                   _RAID_OTHER_PROMPT, member, RAID_DUNGEON_LIST)
         raid_month, raid_date, raid_day = await _get_raid_date(member)
         raid_time = await prompt_freeform('What time do you want to hold the raid? (Use military time, e.g. 18:30)', user)
 

@@ -45,7 +45,7 @@ class Management(commands.Cog):
         Deletes a raid when used in a raid signup channel (admin only)
 
         DEVELOPER INFO:
-        :param ctx: The context of invocation for the command that sheet was ran on.
+        :param ctx: Invocation context
         """
         channel = ctx.channel
         # Only delete channels in the raid categories
@@ -58,6 +58,28 @@ class Management(commands.Cog):
                     except Exception:
                         await ctx.message.author.send('Failed to delete the associated sheet: {}'.format(sheet_title))
                     await channel.delete()
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def notify(self, ctx):
+        """
+        Notifies all raiders signed up for a raid in a given raid channel.
+
+        DEVELOPER INFO:
+        :param ctx: Invocation context
+        """
+        channel = ctx.channel
+        # This should only work in a raid channel
+        if channel.category.name.lower() in [v.lower() for v in RAID_GROUP_DRAWER_MAP.values()]:
+            async for message in channel.history(limit=1, oldest_first=True):
+                if len(message.embeds) > 0:
+                    sheet_title = message.embeds[0].title
+                    raid_worksheet = get_worksheet(sheet_title)
+                    ids = col_values(raid_worksheet, 5)
+                    mention_str = ' '.join(['<@{}>'.format(
+                        raider_id) for raider_id in ids])
+                    notify_msg = await prompt_freeform('Enter the message you would like to blast to all signed up raiders.', ctx.message.author, timeout=180, preserve_fmt=True)
+                    await channel.send('{}\n\n{}'.format(mention_str, notify_msg))
 
     async def _post_add_identity_embed(self, channel):
         embed = discord.Embed()

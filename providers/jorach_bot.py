@@ -21,10 +21,12 @@ def get_jorach():
     return __bot
 
 
-async def prompt_freeform(msg: str, user: User) -> str:
+async def prompt_freeform(msg: str, user: User, timeout=60, preserve_fmt=False) -> str:
     await user.send(msg)
-    user_msg = await __bot.wait_for("message", check=check_message_from_user(user), timeout=60)
+    user_msg = await __bot.wait_for("message", check=check_message_from_user(user), timeout=timeout)
     content = user_msg.content.lower().strip()
+    if preserve_fmt:
+        content = user_msg.content
     if not content:
         await user.send(TIMEOUT_ERR)
         raise Exception(TIMEOUT_ERR)
