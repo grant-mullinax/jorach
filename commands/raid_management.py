@@ -40,6 +40,22 @@ class Management(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
+    async def cleanup(self, ctx):
+        """
+
+        DEVELOPER INFO:
+        CLEAN UP AFTER YOURSELF SKIPPY AHHH
+        """
+        # First, let's create the category if it's not already there.
+        guild = ctx.message.guild
+        for category in guild.categories:
+            if category.name.lower() not in ['general', 'voice channels', 'afk']:
+                for channel in category.channels:
+                    await channel.delete()
+                await category.delete()
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
     async def deleteraid(self, ctx):
         """
         Deletes a raid when used in a raid signup channel (admin only)
