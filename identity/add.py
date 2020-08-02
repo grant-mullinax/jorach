@@ -21,16 +21,12 @@ class AddIdentityMenu(EmbedMenu):
         member_id = str(member.id)
 
         # Gather and validate user info.
-        try:
-            name = await prompt_freeform('What is your character name?', user)
-            name = name.title()
-            # Raise if a duplicate name is found
-            _find_duplicate_name(member_id, name)
-            wow_class = await prompt_choices('What is your class?', user, get_all_classes())
-            wow_role = await prompt_choices('What is your role?', user, get_class_roles(wow_class))
-        except Exception as e:
-            await user.send('Oops, something went wrong: {}'.format(str(e)))
-            return
+        name = await prompt_freeform('What is your character name?', user)
+        name = name.title()
+        # Raise if a duplicate name is found
+        _find_duplicate_name(member_id, name)
+        wow_class = await prompt_choices('What is your class?', user, get_all_classes())
+        wow_role = await prompt_choices('What is your role?', user, get_class_roles(wow_class))
 
         # Attempt to attach both a class role and the 'Raider' role by default.
         # The 'Ravenguard' role MUST be added by an admin manually because we have no way of
@@ -76,7 +72,8 @@ async def _add_nick(member, nickname):
         except:
             # This can fail if the member is too high up on the hierarchy (the bot can't change the nickname
             # of a server owner). Just let it slide for now.
-            print('Could not change nickname for {}'.format(member.name))
+            raise Exception(
+                'Could not change nickname for {}'.format(member.name))
 
 
 def _find_duplicate_name(member_id: str, name: str):

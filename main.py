@@ -1,4 +1,7 @@
 from datetime import datetime
+import logging
+from os import path
+import sys
 
 from commands.info import Info
 from commands.raid_management import Management
@@ -13,6 +16,24 @@ from schema.classes import get_all_classes, get_class_roles
 from schema.roles import Role, get_all_roles
 from sheets.client import *
 
+
+LOG_PATH = '/var/log/jorach.log'
+
+
+# Set up logging
+log = logging.getLogger()
+log.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(formatter)
+log.addHandler(handler)
+if path.exists(LOG_PATH):
+    file_handler = logging.FileHandler(LOG_PATH)
+    file_handler.setFormatter(formatter)
+    log.addHandler(file_handler)
+
+
 # Load configuration info
 config = configparser.ConfigParser()
 config.read_file(open('config.ini'))
@@ -25,10 +46,7 @@ bot.add_cog(Management())
 
 @bot.event
 async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
+    log.info('Logged in as {}'.format(bot.user.name))
 
 
 # Define the sets of handlers for each reaction type (add and remove)
@@ -69,7 +87,7 @@ async def on_raw_reaction_add(payload):
 
 
 async def handle_error(emoji, channel, msg, user, guild, member, e):
-    print('Error for user {} interacting with {}\nException: {}'.format(
+    log.error('Error for user {} interacting with {}\n\nException: {}\n'.format(
         user.name, msg.embeds[0].title, str(e)))
     await user.send('Oops! Something went wrong {}'.format(str(e)))
 

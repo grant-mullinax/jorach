@@ -31,21 +31,16 @@ class RaidSignupMenu(EmbedMenu):
                             + 'up for raids! See the {} channel for info'.format(IDENTITY_MANAGEMENT_CHANNEL))
 
         chosen_row = None
-        try:
-            # Set up mapping between the identity and the row
-            identity_to_row_map = {}
-            user_identities = []
-            for row in user_profile_rows:
-                # 2 is the 0-index of the name column in the identity sheet
-                k = row_values(identity_worksheet, row)[2].lower()
-                identity_to_row_map[k] = row
-                user_identities.append(k)
-            user_choice = await prompt_choices('Which character would you like to sign up with?', user, user_identities)
-            chosen_row = identity_to_row_map[user_choice]
-        except Exception as e:
-            print(e)
-            await user.send('Oops! Something went wrong. {}'.format(str(e)))
-            return
+        # Set up mapping between the identity and the row
+        identity_to_row_map = {}
+        user_identities = []
+        for row in user_profile_rows:
+            # 2 is the 0-index of the name column in the identity sheet
+            k = row_values(identity_worksheet, row)[2].lower()
+            identity_to_row_map[k] = row
+            user_identities.append(k)
+        user_choice = await prompt_choices('Which character would you like to sign up with?', user, user_identities)
+        chosen_row = identity_to_row_map[user_choice]
 
         identity_values = row_values(identity_worksheet, chosen_row)
         user_id, _, name, wow_class, role = identity_values[0:5]
@@ -69,7 +64,7 @@ class RaidDeregisterMenu(EmbedMenu):
         if str(emoji) == SIGNUP_EMOJI:
             embed = msg.embeds[0]
             raid_worksheet = get_worksheet(embed.title)
-            
+
             user_ids = col_values(raid_worksheet, 5)
             try:
                 # Try to delete by the member id
