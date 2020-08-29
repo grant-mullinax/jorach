@@ -94,6 +94,7 @@ async def handle_error(emoji, channel, msg, user, guild, member, e):
     log.error('Error for user {} interacting with {}\n\nException: {}\n'.format(
         user.name, msg.embeds[0].title, str(e)))
     await user.send('Oops! Something went wrong {}'.format(str(e)))
+    raise e
 
 
 async def parse_objs_from_payload(payload):

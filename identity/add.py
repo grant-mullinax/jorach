@@ -34,7 +34,6 @@ class AddIdentityMenu(EmbedMenu):
         # programmatically verifying it.
         is_alt = await _add_roles(wow_class, guild, member)
 
-        # Assume
         if not is_alt:
             await _add_nick(member, name)
 
@@ -56,8 +55,8 @@ async def _add_roles(wow_class, guild, member):
     class_role = get(guild.roles, name=wow_class)
     roles_to_add = [class_role]
     ravenguard_role = get(guild.roles, name=RAVENGUARD_ROLE_NAME)
-    if ravenguard_role not in member.roles:
-        raider_role = get(guild.roles, name=RAIDER_ROLE_NAME)
+    raider_role = get(guild.roles, name=RAIDER_ROLE_NAME)
+    if ravenguard_role not in member.roles and raider_role not in member.roles:
         roles_to_add.append(raider_role)
     await member.add_roles(*roles_to_add)
     return is_alt
