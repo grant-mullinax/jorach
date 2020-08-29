@@ -7,6 +7,7 @@ from commands.info import Info
 from commands.raid_management import Management
 from identity.add import AddIdentityMenu
 from identity.edit import EditIdentityMenu
+from identity.main_class import MainClassMenu
 from identity.remove import RemoveIdentityMenu
 from providers.jorach_bot import get_jorach
 from raid.loot_council import LootCouncilMenu
@@ -58,6 +59,7 @@ ADD_REACTION_MENUS = [
     AddIdentityMenu(),
     EditIdentityMenu(),
     RemoveIdentityMenu(),
+    MainClassMenu(),
     # Loot Council
     LootCouncilMenu(),
 ]

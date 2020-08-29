@@ -1,6 +1,7 @@
+from discord.utils import get
 from menus.embed import EmbedMenu
 from providers.jorach_bot import prompt_choices, prompt_freeform
-from schema.classes import get_all_classes, get_class_roles
+from schema.classes import *
 from schema.constants import *
 from sheets.client import *
 
@@ -31,8 +32,11 @@ class AddIdentityMenu(EmbedMenu):
         # Attempt to attach both a class role and the 'Raider' role by default.
         # The 'Ravenguard' role MUST be added by an admin manually because we have no way of
         # programmatically verifying it.
-        await _add_roles(wow_class, guild, member)
-        await _add_nick(member, name)
+        is_alt = await _add_roles(wow_class, guild, member)
+
+        # Assume
+        if not is_alt:
+            await _add_nick(member, name)
 
         # User does not have a character with the same name; class and role valid. Can register a new profile
         append_row(identity_worksheet, [member_id, str(
@@ -44,25 +48,19 @@ async def _add_roles(wow_class, guild, member):
     """
     Create the appropriate roles if necessary and attach them to the member
     """
-    raider_role = None
-    class_role = None
-    ravenguard_role = None
-    for role in guild.roles:
-        if str(role).lower() == RAIDER_ROLE_NAME:
-            raider_role = role
-        elif str(role).lower() == wow_class.lower():
-            class_role = role
-        elif str(role).lower() == RAVENGUARD_ROLE_NAME:
-            ravenguard_role = role
-        if class_role and raider_role and ravenguard_role:
-            break
-    if not raider_role:
-        raider_role = await guild.create_role(name=RAIDER_ROLE_NAME)
-    if not class_role:
-        class_role = await guild.create_role(name=wow_class)
-    await member.add_roles(class_role)
+    role_names = [str(role) for role in member.roles]
+    class_role_names = CLASS_ROLE_MAP.keys()
+    is_alt = len(set.intersection(set(role_names), set(class_role_names))) >= 1
+    if is_alt:
+        wow_class = '{}-Alt'.format(wow_class)
+    class_role = get(guild.roles, name=wow_class)
+    roles_to_add = [class_role]
+    ravenguard_role = get(guild.roles, name=RAVENGUARD_ROLE_NAME)
     if ravenguard_role not in member.roles:
-        await member.add_roles(raider_role)
+        raider_role = get(guild.roles, name=RAIDER_ROLE_NAME)
+        roles_to_add.append(raider_role)
+    await member.add_roles(*roles_to_add)
+    return is_alt
 
 
 async def _add_nick(member, nickname):

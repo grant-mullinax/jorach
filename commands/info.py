@@ -35,6 +35,17 @@ class Info(commands.Cog):
         await self._raid_reset_timer(ctx, "Zul'Gurub", '2020-04-13 08:00:00', 3)
 
     @commands.command()
+    async def aq(self, ctx):
+        """
+        Shows when the next AQ20 reset is.
+
+        DEVELOPER INFO:
+        :param ctx: The context of invocation
+        :param params: No parameters are used.
+        """
+        await self._raid_reset_timer(ctx, "AQ20", '2020-04-13 08:00:00', 3)
+
+    @commands.command()
     async def sheet(self, ctx):
         """
         Links the current raid signup sheet.

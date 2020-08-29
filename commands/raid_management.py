@@ -6,6 +6,7 @@ from pytz import timezone
 
 from providers.jorach_bot import *
 from schema.constants import *
+from schema.classes import *
 from schema.util import *
 from sheets.client import *
 
@@ -24,6 +25,7 @@ class Management(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def bootstrap(self, ctx):
         """
+        Bootstrap the server to be used with Jorach. Only available to admins.
 
         DEVELOPER INFO:
         Bootstraps the channels for welcoming new users if necessary.
@@ -33,6 +35,10 @@ class Management(commands.Cog):
         welcome_category = await create_category_if_not_exists(guild, START_HERE_CATEGORY)
 
         await self._setup_identity_controls(welcome_category)
+        channel = discord.utils.get(
+            guild.text_channels, name=IDENTITY_MANAGEMENT_CHANNEL)
+        await self._post_main_class_embed(channel)
+        await self._post_set_nick_embed(channel)
         for raid_group, raid_category_name in RAID_GROUP_DRAWER_MAP.items():
             raid_category = await create_category_if_not_exists(guild, raid_category_name)
             await self._setup_raid_drawers(guild, raid_group)
@@ -108,6 +114,25 @@ class Management(commands.Cog):
         msg = await channel.send(embed=embed)
         await msg.add_reaction(INTERACT_EMOJI)
 
+    async def _post_main_class_embed(self, channel):
+        embed = discord.Embed()
+        embed.title = SELECT_MAIN_TITLE
+        embed.description = SELECT_MAIN_DESCRIPTION
+
+        msg = await channel.send(embed=embed)
+        for emoji_id in CLASS_EMOTE_MAP.keys():
+            emoji = discord.utils.get(channel.guild.emojis, id=emoji_id)
+            if emoji:
+                await msg.add_reaction(emoji)
+
+    async def _post_set_nick_embed(self, channel):
+        embed = discord.Embed()
+        embed.title = SELECT_MAIN_TITLE
+        embed.description = SELECT_MAIN_DESCRIPTION
+
+        msg = await channel.send(embed=embed)
+        await msg.add_reaction(INTERACT_EMOJI)
+
     async def _setup_raid_drawers(self, guild, raid_group):
         category_name = RAID_GROUP_DRAWER_MAP.get(raid_group, None)
         if category_name:
@@ -151,6 +176,8 @@ class Management(commands.Cog):
         await self._post_add_identity_embed(channel)
         await self._post_edit_identity_embed(channel)
         await self._post_remove_identity_embed(channel)
+        await self._post_main_class_embed(channel)
+        await self._post_set_nick_embed(channel)
 
     async def _setup_raid_voice_for_category(self, category):
         for channel_name in RAID_DRAWER_ALL_CHANNELS_MAP.get(category.name, []):

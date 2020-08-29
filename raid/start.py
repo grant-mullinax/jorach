@@ -15,6 +15,8 @@ from sheets.client import *
 _RAID_OTHER_PROMPT = 'What would you like to call the raid? ' \
     + 'Use alphanumeric characters and hyphens only [A-Za-z0-9] ' \
     + 'e.g. `onypickup2`, `aq40-group1`.'
+_SPONSOR_PROMPT = 'Would you like to list your name as the leader of this raid? Respond yes if you want your name @-mentioned in the signup embed message.'
+_ANSWER_YES = 'yes'
 
 
 class StartRaidMenu(EmbedMenu):
@@ -29,7 +31,7 @@ class StartRaidMenu(EmbedMenu):
         raid_category = channel.category.name
         raid_group = _get_raid_group(raid_category)
 
-        if raid_group == RAID_GROUP_ZG:
+        if raid_group == RAID_GROUP_20:
             raid_name = await prompt_freeform('What is the name of your raid group?\n(e.g. `Megasharks`, `Besaid Barcas`, `Wangsly and the Jets`).\nPlease keep it short and use alphanum only so nothing breaks. Kthx', user)
         else:
             raid_name = await prompt_choices_other('What type of raid would you like to start?',
@@ -59,8 +61,12 @@ class StartRaidMenu(EmbedMenu):
             return
         channel = await category.create_text_channel(channel_name)
         mention = None
-        if raid_group == RAID_GROUP_ZG:
+        if raid_group == RAID_GROUP_20:
             mention = user.mention
+        else:
+            should_sponsor = await prompt_choices(_SPONSOR_PROMPT, user, [_ANSWER_YES, 'no'])
+            if should_sponsor == _ANSWER_YES:
+                mention = user.mention
         msg = await channel.send(embed=RaidSignupEmbed(raid_title, get_worksheet_link(worksheet), mention=mention).embed)
         await msg.add_reaction(SIGNUP_EMOJI)
         if role_mention:
