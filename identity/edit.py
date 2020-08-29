@@ -38,7 +38,7 @@ class EditIdentityMenu(EmbedMenu):
                                                    value_to_find=name.lower(), list_search_rows=user_rows)
         data = row_values(identity_worksheet, named_rows[0])
         wow_class = data[3]
-        wow_role = await prompt_choices("What is your role?", user, get_class_roles(wow_class))
+        wow_role = await prompt_choices("What is your role?", user, get_class_roles(wow_class.title()))
         for r in named_rows:
             delete_row(identity_worksheet, r)
         append_row(identity_worksheet, [member_id, str(
