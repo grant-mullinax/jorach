@@ -33,14 +33,14 @@ class EditIdentityMenu(EmbedMenu):
         character_names = [row_values(identity_worksheet, row)[
             2].title() for row in user_rows]
         name = await prompt_choices("Which identity would you like to edit?", user, character_names)
-        wow_class = await prompt_choices("What is your class?", user, get_all_classes())
-        wow_role = await prompt_choices("What is your role?", user, get_class_roles(wow_class))
-
         # The user has other profiles; make sure a character with the name exists!
         named_rows = get_rows_with_value_in_column(identity_worksheet, column_index=3,
                                                    value_to_find=name.lower(), list_search_rows=user_rows)
-
-        delete_row(identity_worksheet, named_rows[0])
+        row = named_rows[0]
+        wow_class = row[3]
+        wow_role = await prompt_choices("What is your role?", user, get_class_roles(wow_class))
+        for r in named_rows:
+            delete_row(identity_worksheet, r)
         append_row(identity_worksheet, [member_id, str(
             member), name.lower(), wow_class.lower(), wow_role.lower()])
         await user.send("Your identity was updated successfully!")

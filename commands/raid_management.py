@@ -20,6 +20,7 @@ class Management(commands.Cog):
     """
     `Management` is a class that allows admin users to create raids for users
     """
+
     # @commands.command()
     # @commands.has_permissions(administrator=True)
     # async def bootstrap(self, ctx):
