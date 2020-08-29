@@ -36,8 +36,8 @@ class EditIdentityMenu(EmbedMenu):
         # The user has other profiles; make sure a character with the name exists!
         named_rows = get_rows_with_value_in_column(identity_worksheet, column_index=3,
                                                    value_to_find=name.lower(), list_search_rows=user_rows)
-        row = named_rows[0]
-        wow_class = row[3]
+        data = row_values(named_rows[0])
+        wow_class = data[3]
         wow_role = await prompt_choices("What is your role?", user, get_class_roles(wow_class))
         for r in named_rows:
             delete_row(identity_worksheet, r)
