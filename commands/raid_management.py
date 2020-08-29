@@ -17,44 +17,27 @@ RAID_OTHER_PROMPT = 'What would you like to call the raid? ' \
 
 
 class Management(commands.Cog):
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def rolebootstrap(self, ctx):
-        """
-        Bootstrap the server to be used with Jorach. Only available to admins.
-
-        DEVELOPER INFO:
-        Bootstraps the channels for welcoming new users if necessary.
-        """
-        # First, let's create the category if it's not already there.
-        guild = ctx.message.guild
-
-        for role, colorhex in CLASS_COLORS_MAP.items():
-            role_name = '{}-Alt'.format(role)
-            color = discord.Colour(colorhex)
-            await guild.create_role(name=role_name, colour=color)
-
     """
     `Management` is a class that allows admin users to create raids for users
     """
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def bootstrap(self, ctx):
-        """
-        Bootstrap the server to be used with Jorach. Only available to admins.
+    # @commands.command()
+    # @commands.has_permissions(administrator=True)
+    # async def bootstrap(self, ctx):
+    #     """
+    #     Bootstrap the server to be used with Jorach. Only available to admins.
 
-        DEVELOPER INFO:
-        Bootstraps the channels for welcoming new users if necessary.
-        """
-        # First, let's create the category if it's not already there.
-        guild = ctx.message.guild
-        welcome_category = await create_category_if_not_exists(guild, START_HERE_CATEGORY)
+    #     DEVELOPER INFO:
+    #     Bootstraps the channels for welcoming new users if necessary.
+    #     """
+    #     # First, let's create the category if it's not already there.
+    #     guild = ctx.message.guild
+    #     welcome_category = await create_category_if_not_exists(guild, START_HERE_CATEGORY)
 
-        await self._setup_identity_controls(welcome_category)
-        for raid_group, raid_category_name in RAID_GROUP_DRAWER_MAP.items():
-            raid_category = await create_category_if_not_exists(guild, raid_category_name)
-            await self._setup_raid_drawers(guild, raid_group)
-            await self._setup_raid_voice_for_category(raid_category)
+    #     await self._setup_identity_controls(welcome_category)
+    #     for raid_group, raid_category_name in RAID_GROUP_DRAWER_MAP.items():
+    #         raid_category = await create_category_if_not_exists(guild, raid_category_name)
+    #         await self._setup_raid_drawers(guild, raid_group)
+    #         await self._setup_raid_voice_for_category(raid_category)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
