@@ -39,7 +39,7 @@ CLASS_EMOTE_MAP = {
     # 615267826160369674: 'Shaman',
     615267826042929153: 'Warlock',
     615267826223022100: 'Warrior',
-
+}
 
 
 class WowClass(Enum):
