@@ -16,16 +16,16 @@ CLASS_ROLE_MAP = {
 
 
 CLASS_COLORS_MAP = {
-    'Druid': '#FF7D0A',
-    'Hunter': '#ABD473',
-    'Mage': '#69CCF0',
-    'Paladin': '#F58CBA',
+    'Druid': 0xFF7D0A,
+    'Hunter': 0xABD473,
+    'Mage': 0x69CCF0,
+    'Paladin': 0xF58CBA,
     # Not the real color but people actually use the white background on Discord soooo
-    'Priest': '#CCCCCC',
-    'Rogue': '#FFF569',
-    # 'Shaman': '#0070DE',
-    'Warlock': '#9482C9',
-    'Warrior': '#C79C6E',
+    'Priest': 0xCCCCCC,
+    'Rogue': 0xFFF569,
+    # 'Shaman': 0x0070DE,
+    'Warlock': 0x9482C9,
+    'Warrior': 0xC79C6E,
 }
 
 
