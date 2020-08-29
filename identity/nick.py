@@ -15,6 +15,10 @@ class SetNicknameMenu(EmbedMenu):
     async def handle_emoji(self, emoji, channel, msg, user, guild, member):
         await msg.remove_reaction(emoji, user)
         if str(emoji) == INTERACT_EMOJI:
-            nickname = await prompt_freeform('Please enter your nickname.', user, preserve_fmt=True)
+            nickname = await prompt_freeform('Please enter your nickname. Note that this will not work if you are an admin.'
+                                             + 'If you are an admin, just change your nickname manually.',
+                                             user,
+                                             preserve_fmt=True
+                                             )
             await member.edit(nick=nickname)
         return
