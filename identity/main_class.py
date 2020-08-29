@@ -33,16 +33,18 @@ class MainClassMenu(EmbedMenu):
 async def _manage_roles(main_role_name, guild, member):
     class_roles = CLASS_ROLE_MAP.keys()
     main_role = get(guild.roles, name=main_role_name)
-    roles_to_add = [main_role]
+    roles_to_add = []
     roles_to_remove = []
+
+    if main_role not in member.roles:
+        roles_to_add.append(main_role)
+    old_alt_role = get(member.roles, name='{}-Alt'.format(main_role_name))
+    if old_alt_role:
+        roles_to_remove.append(old_alt_role)
+
     for role in member.roles:
         # Accumulate all of the main roles to be converted from main to alt
-        if role == main_role:
-            roles_to_add.remove(role)
-            old_alt_role = get(member.roles, name='{}-Alt'.format(str(role)))
-            if old_alt_role:
-                roles_to_remove.append(old_alt_role)
-        elif str(role) in class_roles:
+        if str(role) in class_roles:
             roles_to_remove.append(role)
             alt_role = get(guild.roles, name='{}-Alt'.format(str(role)))
             roles_to_add.append(alt_role)
