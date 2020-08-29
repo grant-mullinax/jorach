@@ -122,13 +122,14 @@ class Management(commands.Cog):
         msg = await channel.send(embed=embed)
         for emoji_id in CLASS_EMOTE_MAP.keys():
             emoji = discord.utils.get(channel.guild.emojis, id=emoji_id)
+            print(emoji, emoji_id)
             if emoji:
                 await msg.add_reaction(emoji)
 
     async def _post_set_nick_embed(self, channel):
         embed = discord.Embed()
-        embed.title = SELECT_MAIN_TITLE
-        embed.description = SELECT_MAIN_DESCRIPTION
+        embed.title = SET_NICK_EMBED_TITLE
+        embed.description = SET_NICK_DESCRIPTION
 
         msg = await channel.send(embed=embed)
         await msg.add_reaction(INTERACT_EMOJI)
