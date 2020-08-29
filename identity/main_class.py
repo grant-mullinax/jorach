@@ -38,13 +38,12 @@ async def _manage_roles(main_role_name, guild, member):
 
     if main_role not in member.roles:
         roles_to_add.append(main_role)
-    old_alt_role = get(member.roles, name='{}-Alt'.format(main_role_name))
-    if old_alt_role:
-        roles_to_remove.append(old_alt_role)
+    old_alt_role = get(guild.roles, name='{}-Alt'.format(main_role_name))
+    roles_to_remove.append(old_alt_role)
 
     for role in member.roles:
         # Accumulate all of the main roles to be converted from main to alt
-        if str(role) in class_roles:
+        if str(role) in class_roles and str(role) != main_role_name:
             roles_to_remove.append(role)
             alt_role = get(guild.roles, name='{}-Alt'.format(str(role)))
             roles_to_add.append(alt_role)
