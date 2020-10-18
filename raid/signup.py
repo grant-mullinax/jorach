@@ -39,7 +39,7 @@ class RaidSignupMenu(EmbedMenu):
             k = row_values(identity_worksheet, row)[2].lower()
             identity_to_row_map[k] = row
             user_identities.append(k)
-        user_choice = await prompt_choices('Which character would you like to sign up with?', user, user_identities)
+        user_choice = await prompt_choices('Which character would you like to sign up with for `{}`?'.format(embed.title), user, user_identities)
         chosen_row = identity_to_row_map[user_choice]
 
         identity_values = row_values(identity_worksheet, chosen_row)
@@ -49,7 +49,7 @@ class RaidSignupMenu(EmbedMenu):
         insert_row(raid_worksheet, [name, wow_class, role, str(
             datetime.now()), user_id], len(names) + 1)
 
-        await user.send('Thank you! Your attendance has been recorded successfully.')
+        await user.send('Thank you! Your attendance for `{}` has been recorded successfully.'.format(embed.title))
         await _update_raid_embed(msg)
 
 
