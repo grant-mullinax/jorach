@@ -1,4 +1,5 @@
 from discord import Intents, User
+from discord.channel import DMChannel
 from discord.ext import commands
 from schema.constants import *
 
@@ -81,6 +82,6 @@ async def prompt_choices_other(msg_header: str, other_header: str, user: User, c
 
 def check_message_from_user(user):
     def inner_check(message):
-        return message.author == user
+        return message.author == user and isinstance(message.channel, DMChannel)
 
     return inner_check
