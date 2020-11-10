@@ -1,4 +1,4 @@
-from discord import User
+from discord import Intents, User
 from discord.ext import commands
 from schema.constants import *
 
@@ -10,8 +10,11 @@ Get started by looking in the #{} channel!
 Look at my insides at
 https://github.com/grant-mullinax/jorach
 """.format(IDENTITY_MANAGEMENT_CHANNEL)
+
+__intents = Intents.default()
+__intents.members = True
 __bot = commands.Bot(command_prefix="!",
-                     description=__bot_description, case_insensitive=True)
+                     description=__bot_description, case_insensitive=True, intents=__intents)
 
 
 def get_jorach():
