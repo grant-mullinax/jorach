@@ -70,7 +70,7 @@ async def _channel_move_helper(user, guild, raid_drawer_name, src_channel_name, 
     src_channel = find_by_name(category.voice_channels, src_channel_name)
     dest_channel = find_by_name(category.voice_channels, dest_channel_name)
     if not src_channel or not dest_channel:
-        await user.send('Couldn not find the loot council voice channel')
+        await user.send('Could not find the loot council voice channel')
         return
     role = find_by_name(guild.roles, LC_ROLE)
     if not role:
