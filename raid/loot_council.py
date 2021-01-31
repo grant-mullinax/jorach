@@ -53,9 +53,14 @@ async def _loot_council_end(user, guild, raid_type):
 
 
 def _get_raid_type_from_embed(msg):
-    tokens = msg.embeds[0].title.split(' ')
-    return tokens[0].upper()
+    title = msg.embeds[0].title
 
+    for embedTitle in EMBED_TITLES:
+        title = title.replace(embedTitle, '')
+
+    title = title.strip()
+
+    return title
 
 async def _channel_move_helper(user, guild, raid_drawer_name, src_channel_name, dest_channel_name):
     if not src_channel_name or not dest_channel_name or not raid_drawer_name:
@@ -70,7 +75,7 @@ async def _channel_move_helper(user, guild, raid_drawer_name, src_channel_name, 
     src_channel = find_by_name(category.voice_channels, src_channel_name)
     dest_channel = find_by_name(category.voice_channels, dest_channel_name)
     if not src_channel or not dest_channel:
-        await user.send('Couldn not find the loot council voice channel')
+        await user.send('Could not find the loot council voice channel')
         return
     role = find_by_name(guild.roles, LC_ROLE)
     if not role:
